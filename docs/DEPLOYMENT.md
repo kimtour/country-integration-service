@@ -172,7 +172,7 @@ Create a country through localhost:8083 and read the countries through localhost
 
 These results were observed during the initial validation on 8 October 2026. A later recheck found both application pods unready after liveness/startup probe timeouts and restarts, while MySQL remained ready. Application logs showed slow Spring Boot initialization and successful database connection. Sustained availability has not been established. Inspect pod events and logs, check Docker Desktop resource availability, and measure startup/probe response times before adjusting resources or probe budgets.
 
-| Verification | Observed result |
+| Verification | Initial observed result |
 | --- | --- |
 | Full Maven package build | 27 tests passed and executable JAR produced |
 | Compose SOAP integration | Uganda created with 201 and saved to MySQL |
@@ -196,6 +196,7 @@ Country responses reproduce fields supplied by the external SOAP service. Their 
 | PVC remains Pending | Inspect the claim and check the cluster's default StorageClass |
 | ImagePullBackOff | Inspect pod events and ensure the image is available to the cluster or registry |
 | Pod stays unready | Inspect startup logs, database connectivity, probe events, and resource constraints |
+| Startup/liveness probe timeouts and restarts | Compare initialization duration and probe latency with the configured budgets; check Docker Desktop CPU/memory availability and pod events. Readiness gates traffic; failed startup/liveness probes can restart the container. Investigate before increasing budgets |
 | OOMKilled | Inspect resource usage and tune JVM heap and container memory together |
 | Port-forward stops | Select a current ready pod and start the forwarding session again |
 | SOAP request fails | Check upstream availability and network access; inspect transport logs and status |

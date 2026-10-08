@@ -180,3 +180,13 @@ Both replicas run on one Docker Desktop node. MySQL has one instance. Multi-node
 The current schema is managed through Hibernate ddl-auto=update. For fresh deployment, initialize the schema with one application replica before increasing to two. Versioned database migrations and Hibernate validation are planned improvements.
 
 The SOAP endpoint currently uses HTTP. API authentication, TLS termination, isolated database tests, production secret management, database high availability, backup/restore testing, and load testing need further implementation or deployment configuration. Framework exception handling should also be expanded to preserve other standard HTTP statuses, including unsupported media types.
+
+## Case study submission
+
+Prepared by Samuel Mutua Kimani.
+
+- [Presentation, 11 slides](docs/submission/Case_Study_Submission-Integrations_and_Microservices_Engineer-Samuel_Mutua_Kimani.pptx)
+- [Matching PDF, 11 pages](docs/submission/Case_Study_Submission-Integrations_and_Microservices_Engineer-Samuel_Mutua_Kimani.pdf)
+- [GitHub repository](https://github.com/kimtour/country-integration-service)
+
+The presentation distinguishes the successful initial Kubernetes checks from later startup/liveness probe timeouts and restarts. See [submission instructions and email draft](docs/submission/README.md).
