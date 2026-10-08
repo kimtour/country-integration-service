@@ -171,7 +171,7 @@ kubectl --context=docker-desktop -n country-integration \
 
 The Kubernetes database has separate storage from Compose. The local deployment passed health checks, country creation, duplicate handling, and shared-data checks across two application replicas. Tanzania created through one replica was readable through the other.
 
-A later cluster recheck found application restarts and unready pods after startup/liveness probe timeouts; MySQL remained ready. The earlier shared-persistence test passed, but sustained local availability remains unverified. See the deployment guide for troubleshooting.
+A later recheck exposed CPU throttling and probe timeouts. The local manifest now requests 500m CPU, allows two CPUs, gives startup ten minutes, and uses ten-second probe timeouts with six liveness failures before restart. Rolling updates replace one replica at a time without surge. After this change, both replicas started in about 64 and 49 seconds and passed a five-minute observation with 88 successful health/data requests, two ready Service backends, and zero restarts. Both returned Kenya and Tanzania. This verifies the local fix over that window; long-term availability and load capacity require separate tests. See the deployment guide for details.
 
 Both replicas run on one Docker Desktop node. MySQL has one instance. Multi-node resilience, automatic scaling, database failover, and production backups have not been verified.
 
@@ -189,4 +189,4 @@ Prepared by Samuel Mutua Kimani.
 - [Matching PDF, 11 pages](docs/submission/Case_Study_Submission-Integrations_and_Microservices_Engineer-Samuel_Mutua_Kimani.pdf)
 - [GitHub repository](https://github.com/kimtour/country-integration-service)
 
-The presentation distinguishes the successful initial Kubernetes checks from later startup/liveness probe timeouts and restarts. See [submission instructions and email draft](docs/submission/README.md).
+The presentation records the initial successful checks, the later probe failures, and recovery after CPU/probe tuning. See [submission instructions and email draft](docs/submission/README.md).

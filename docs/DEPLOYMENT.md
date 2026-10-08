@@ -140,11 +140,11 @@ The application ConfigMap contains database connection settings, SOAP URL, and J
 
 | Check | Behavior |
 | --- | --- |
-| Startup | Allows approximately five minutes for initialization before restart |
+| Startup | Allows approximately ten minutes for initialization before restart |
 | Readiness | Checks application readiness and database connectivity before Service traffic |
 | Liveness | Checks application liveness independently of database availability |
 
-The application requests 250 millicores and 256 MiB, with limits of one CPU and 768 MiB. These are local practice settings that need measurement under load. One recorded second-replica startup took roughly four minutes.
+The application requests 500 millicores and 256 MiB, with limits of two CPUs and 768 MiB. Probe requests have a ten-second timeout. Liveness requires six consecutive failed checks at twenty-second intervals before restarting a started container; readiness still requires database connectivity and fails after three checks. Rolling updates replace one pod at a time without adding a third application replica (maxSurge=0, maxUnavailable=1). A replacement must stay ready for fifteen seconds before progressing, and the rollout progress deadline is fifteen minutes. These local settings need measurement under production load.
 
 The final verified deployment has two application replicas and one MySQL replica. Both application replicas share MySQL, so saved countries are available across replicas.
 
@@ -170,7 +170,7 @@ Create a country through localhost:8083 and read the countries through localhost
 
 ## Verified results
 
-These results were observed during the initial validation on 8 October 2026. A later recheck found both application pods unready after liveness/startup probe timeouts and restarts, while MySQL remained ready. Application logs showed slow Spring Boot initialization and successful database connection. Sustained availability has not been established. Inspect pod events and logs, check Docker Desktop resource availability, and measure startup/probe response times before adjusting resources or probe budgets.
+These results were observed during the initial validation on 8 October 2026. A later recheck found both application pods unready after liveness/startup probe timeouts and restarts, while MySQL remained ready. Application logs showed slow Spring Boot initialization and successful database connection. Investigation found CPU throttling, slow initialization, and healthy HTTP 200 probe responses taking about 8.7 seconds, exceeding the previous five-second timeout. No OOM events were recorded in the inspected container. The manifest now gives the app more CPU headroom, a ten-minute startup allowance, and longer probe budgets; rolling updates avoid a third simultaneous JVM. Production availability still requires separate testing.
 
 | Verification | Initial observed result |
 | --- | --- |
@@ -182,6 +182,12 @@ These results were observed during the initial validation on 8 October 2026. A l
 | Kubernetes creation | Kenya created with 201; duplicate returned 409 |
 | Application scaling | Two pods ready, two ready Service backends |
 | Cross-replica persistence | Tanzania created through replica one and read through replica two |
+
+### Verification after resource and probe tuning
+
+On 8 October 2026, the replacement application pods started in 64.443 and 49.013 seconds. The rollout completed with two ready application pods and two ready Service backends; both new pods had zero restarts. Over five minutes, eleven samples checked health, readiness, liveness, and the countries API on each pod through separate port-forwards: all 88 requests returned HTTP 200, all health responses were UP, and both replicas returned identical Kenya and Tanzania records. Pod identity, readiness, and zero restart counts were verified in every sample. MySQL remained ready.
+
+The first cold countries reads took roughly eighteen seconds under local host load; later sampled reads and health requests completed within their test timeouts. This checks recovery over a short local observation window, not production availability or load capacity. Local host/VM contention can still affect latency. The Mac and Docker Desktop need sufficient CPU/memory capacity for predictable behavior; longer probe budgets do not repair exhausted resources.
 
 Country responses reproduce fields supplied by the external SOAP service. Their geopolitical or language data is not independently corrected by the application.
 

@@ -10,7 +10,7 @@ Prepared by Samuel Mutua Kimani. Use the revised files in this directory; the ea
 
 The repository includes implementation, tests, Docker configuration, Kubernetes manifests, the root README, and deployment/troubleshooting documentation. Local credentials and build outputs are excluded.
 
-Initial Kubernetes health and cross-replica persistence checks passed. Later checks found startup/liveness probe timeouts and app restarts while MySQL remained ready. The presentation and guides record this limitation; sustained availability has not been established.
+Initial Kubernetes health and cross-replica persistence checks passed. Later CPU throttling and short probe budgets caused a restart loop. After resource/probe tuning and a serial rollout, both replacement replicas started in about 64 and 49 seconds, returned the saved Kenya and Tanzania data, and completed a five-minute observation with 88 successful health/data requests and zero restarts. The presentation and guides record this recovery. Production availability and load capacity remain unverified.
 
 ## Submission
 
