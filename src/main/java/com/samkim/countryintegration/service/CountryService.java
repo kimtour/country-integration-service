@@ -33,7 +33,7 @@ public class CountryService {
         String isoCode;
 
         try {
-            isoCode = soapClient.fetchIsoCode(normalizedName);
+            isoCode = resolveIsoCode(normalizedName);
 
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(
@@ -130,6 +130,26 @@ public class CountryService {
                 exception);
     }
 
+    private String resolveIsoCode(String sentenceCaseName) {
+        try {
+            return soapClient.fetchIsoCode(sentenceCaseName);
+        } catch (IllegalArgumentException unknownCountry) {
+            // The assessment requires sentence case, but the provider uses exact
+            // title-case names for countries such as South Africa.
+            if (!sentenceCaseName.contains(" ")) {
+                throw unknownCountry;
+            }
+            String titleCaseName = java.util.Arrays.stream(sentenceCaseName.split(" "))
+                    .map(word -> word.substring(0, 1).toUpperCase(Locale.ROOT)
+                            + word.substring(1))
+                    .collect(java.util.stream.Collectors.joining(" "));
+            if (titleCaseName.equals(sentenceCaseName)) {
+                throw unknownCountry;
+            }
+            return soapClient.fetchIsoCode(titleCaseName);
+        }
+    }
+
     private String normalizeName(String name) {
         if (name == null || name.isBlank()) {
             throw new ResponseStatusException(
@@ -137,7 +157,7 @@ public class CountryService {
                     "Country name is required");
         }
 
-        String trimmed = name.trim().toLowerCase(Locale.ROOT);
+        String trimmed = name.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
 
         return trimmed.substring(0, 1).toUpperCase(Locale.ROOT)
                 + trimmed.substring(1);

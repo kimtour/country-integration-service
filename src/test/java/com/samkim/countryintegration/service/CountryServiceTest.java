@@ -51,6 +51,57 @@ class CountryServiceTest {
     }
 
     @Test
+    void normalizesMultiWordNamesToSentenceCase() {
+        CountryInfo country = new CountryInfo("ZA", "South Africa");
+        when(soapClient.fetchIsoCode("South africa")).thenReturn("ZA");
+        when(repository.findByIsoCode("ZA")).thenReturn(Optional.empty());
+        when(soapClient.fetchFullCountryInfo("ZA")).thenReturn(country);
+        when(repository.saveAndFlush(country)).thenReturn(country);
+        assertSame(country, service.createCountry("  SOUTH   AFRICA  "));
+        verify(soapClient).fetchIsoCode("South africa");
+    }
+
+    @Test
+    void retriesUnknownMultiWordNameWithProviderTitleCase() {
+        CountryInfo country = new CountryInfo("ZA", "South Africa");
+        when(soapClient.fetchIsoCode("South africa"))
+                .thenThrow(new IllegalArgumentException("Unknown country"));
+        when(soapClient.fetchIsoCode("South Africa")).thenReturn("ZA");
+        when(repository.findByIsoCode("ZA")).thenReturn(Optional.empty());
+        when(soapClient.fetchFullCountryInfo("ZA")).thenReturn(country);
+        when(repository.saveAndFlush(country)).thenReturn(country);
+        assertSame(country, service.createCountry("south africa"));
+        var order = inOrder(soapClient);
+        order.verify(soapClient).fetchIsoCode("South africa");
+        order.verify(soapClient).fetchIsoCode("South Africa");
+        order.verify(soapClient).fetchFullCountryInfo("ZA");
+    }
+
+    @Test
+    void unknownMultiWordCountryStillReturns404() {
+        when(soapClient.fetchIsoCode("Unknown country"))
+                .thenThrow(new IllegalArgumentException("Unknown country"));
+        when(soapClient.fetchIsoCode("Unknown Country"))
+                .thenThrow(new IllegalArgumentException("Unknown country"));
+        ResponseStatusException failure = assertThrows(ResponseStatusException.class,
+                () -> service.createCountry("unknown country"));
+        assertEquals(HttpStatus.NOT_FOUND, failure.getStatusCode());
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void unknownSingleWordCountryDoesNotRepeatLookup() {
+        when(soapClient.fetchIsoCode("Unknown"))
+                .thenThrow(new IllegalArgumentException("Unknown country"));
+        ResponseStatusException failure = assertThrows(ResponseStatusException.class,
+                () -> service.createCountry("unknown"));
+        assertEquals(HttpStatus.NOT_FOUND, failure.getStatusCode());
+        verify(soapClient, times(1)).fetchIsoCode("Unknown");
+        verifyNoMoreInteractions(soapClient);
+        verifyNoInteractions(repository);
+    }
+
+    @Test
     void rejectsBlankNameBeforeCallingSoap() {
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,

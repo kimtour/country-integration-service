@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.repository.CountryRepositoryTest" time="9.516" tests="4" errors="0" skipped="0" failures="0" flakes="0">
+  <testcase name="deleteCascadesToLanguages" classname="com.samkim.countryintegration.repository.CountryRepositoryTest" time="2.267">
+    </testcase>
+  <testcase name="replacementRemovesOrphanLanguages" classname="com.samkim.countryintegration.repository.CountryRepositoryTest" time="0.083">
+    </testcase>
+  <testcase name="persistsCountryAndLoadsLanguagesForBothReadPaths" classname="com.samkim.countryintegration.repository.CountryRepositoryTest" time="0.064">
+    </testcase>
+  <testcase name="databaseRejectsDuplicateIsoCodes" classname="com.samkim.countryintegration.repository.CountryRepositoryTest" time="0.045">
+    </testcase>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.integration.CountrySoapClientTest" time="2.304" tests="9" errors="0" skipped="0" failures="0" flakes="0">
+  <testcase name="rejectsSoapFault" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="1.892" />
+  <testcase name="rejectsMalformedXml" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.051">
+    </testcase>
+  <testcase name="escapesSpecialCharactersInCountryName" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.059" />
+  <testcase name="rejectsEmptyIsoCodeResult" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.02" />
+  <testcase name="readsCountryFieldsAndMultipleLanguages" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.025" />
+  <testcase name="recognizesProvidersUnknownCountryMessage" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.014" />
+  <testcase name="malformedIsoCodeStillIndicatesBadUpstreamData" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.014" />
+  <testcase name="readsIsoCodeRegardlessOfNamespacePrefix" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.026" />
+  <testcase name="rejectsDoctypeAndExternalEntities" classname="com.samkim.countryintegration.integration.CountrySoapClientTest" time="0.164">
+    </testcase>
+</testsuite>

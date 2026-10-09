@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="Country integration assessment.CountryInfo smoke tests" tests="3" failures="0" errors="0" time="9.231">
+  <testcase name="CountryISOCode - Tanzania" time="7.577" />
+  <testcase name="FullCountryInfo - TZ" time="1.145" />
+  <testcase name="CountryISOCode - South Africa" time="0.509" />
+</testsuite>

@@ -85,6 +85,26 @@ class CountrySoapClientTest {
     }
 
     @Test
+    void recognizesProvidersUnknownCountryMessage() {
+        when(transport.send(anyString())).thenReturn(envelope("""
+                <x:CountryISOCodeResponse>
+                    <x:CountryISOCodeResult>No country found by that name</x:CountryISOCodeResult>
+                </x:CountryISOCodeResponse>
+                """));
+        assertThrows(IllegalArgumentException.class, () -> client.fetchIsoCode("South africa"));
+    }
+
+    @Test
+    void malformedIsoCodeStillIndicatesBadUpstreamData() {
+        when(transport.send(anyString())).thenReturn(envelope("""
+                <x:CountryISOCodeResponse>
+                    <x:CountryISOCodeResult>INVALID</x:CountryISOCodeResult>
+                </x:CountryISOCodeResponse>
+                """));
+        assertThrows(IllegalStateException.class, () -> client.fetchIsoCode("Kenya"));
+    }
+
+    @Test
     void rejectsSoapFault() {
         when(transport.send(anyString())).thenReturn(envelope("""
                 <soap:Fault>

@@ -1,5 +1,9 @@
 **
 !Dockerfile
-!target/
-target/*
-!target/country-integration-service-0.0.1-SNAPSHOT.jar
+!pom.xml
+!mvnw
+!.mvn/
+!.mvn/**
+!src/
+!src/main/
+!src/main/**

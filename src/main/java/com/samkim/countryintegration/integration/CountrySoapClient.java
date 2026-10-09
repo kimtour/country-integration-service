@@ -60,7 +60,7 @@ public class CountrySoapClient {
 
         String isoCode = results.item(0).getTextContent().trim();
 
-        if (isoCode.isEmpty()) {
+        if (isoCode.isEmpty() || isoCode.equalsIgnoreCase("No country found by that name")) {
             throw new IllegalArgumentException(
                     "Country was not found: " + countryName);
         }

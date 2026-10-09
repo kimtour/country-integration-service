@@ -7,7 +7,7 @@
 - Run commands from the project root, beside pom.xml, Dockerfile, and compose.yaml.
 - The SOAP service requires outbound network access.
 
-The application uses MySQL 8.4. The supplied Dockerfile packages an already-built executable JAR. Build the JAR before building the image.
+The application uses MySQL 8.4. The Dockerfile builds from source in a Java 25 stage and packages the resulting JAR in a non-root runtime image. No prebuilt JAR is required.
 
 ## Local credentials
 
@@ -22,21 +22,21 @@ Exclude `.env` from Git. Include a placeholder-only `.env.example` for reviewers
 
 ## Build and test
 
-Start the development database:
+Run the isolated default tests:
 
 ```bash
-docker compose up -d mysql
+./mvnw clean verify
 ```
 
-Set DB_PASSWORD in your shell to the same application password used in `.env`. A local `.env` file is read by Compose; it does not automatically populate the environment of a Maven process.
+No live database or password is required. To verify against a temporary real MySQL 8.4 database, start Docker Desktop and run:
 
 ```bash
-export DB_PASSWORD='replace_with_your_local_app_password'
-./mvnw clean package
-ls -lh target/*.jar
+./mvnw -Pmysql-it clean verify
 ```
 
-The full suite currently includes a Spring Boot context test that requires MySQL at localhost:3307. The other five test classes use mocks, standalone MockMvc, or a local HTTP server. The reported full build passed 27 tests with zero failures, errors, or skipped tests.
+42 default tests and 5 MySQL integration tests pass. The latter verifies persistence, eager language loading, replacement/orphan cleanup, cascading deletion, unique ISO codes, and concurrent duplicate handling. See [test evidence](TEST_RESULTS.md). Testcontainers creates a separate database and cleans it up; existing country data is untouched.
+
+For `./mvnw spring-boot:run`, start Compose MySQL and export DB_PASSWORD matching `.env`. Compose reads `.env`; Maven does not load it automatically.
 
 Expected executable JAR:
 
@@ -69,11 +69,19 @@ To stop the Compose containers while preserving their database volume:
 docker compose stop
 ```
 
-After Java source changes, run the package build again, then rebuild and recreate the application container with `docker compose up -d --build app`.
+After Java source changes, rebuild and recreate the application container with `docker compose up -d --build app`.
 
 ## Kubernetes deployment
 
-All commands explicitly target the local docker-desktop context.
+Use the tested deployment script:
+
+```bash
+./scripts/deploy.sh
+```
+
+It builds from source, applies namespace/credentials/MySQL, starts one app replica to initialize the schema, then scales to APP_REPLICAS (default two). KUBE_CONTEXT defaults to docker-desktop. APP_IMAGE defaults to a source-derived build tag from scripts/image-tag.py. Use a new tag for changed source; a restart alone can reuse a stale node image. For a remote cluster, build/push a registry image and use matching configuration. Existing database volumes keep their initialized passwords; updating a Secret alone does not change MySQL accounts.
+
+The manual commands below target the local docker-desktop context.
 
 ```bash
 kubectl --context=docker-desktop get nodes
@@ -101,10 +109,10 @@ kubectl --context=docker-desktop -n country-integration get pods,pvc,services
 
 MySQL should show 1/1 ready, and mysql-data should be Bound. Its 2 GiB claim provides database storage separate from the Compose volume.
 
-Build the application image from the packaged JAR:
+Build the application image from source:
 
 ```bash
-docker build -t country-integration-service:0.0.1 .
+docker build -t country-integration-service:$(python3 scripts/image-tag.py) .
 ```
 
 For a fresh database, begin with `replicas: 1` in k8s/app.yaml. The current application creates its schema with Hibernate ddl-auto=update. After the first pod has initialized the schema successfully, set replicas to 2 and reapply. Explicit database migrations are a production improvement still to implement.
@@ -112,7 +120,7 @@ For a fresh database, begin with `replicas: 1` in k8s/app.yaml. The current appl
 ```bash
 kubectl --context=docker-desktop apply -f k8s/app.yaml
 kubectl --context=docker-desktop -n country-integration \
-  rollout status deployment/country-app --timeout=360s
+  rollout status deployment/country-app --timeout=900s
 kubectl --context=docker-desktop -n country-integration get pods -o wide
 ```
 
@@ -191,6 +199,12 @@ The first cold countries reads took roughly eighteen seconds under local host lo
 
 Country responses reproduce fields supplied by the external SOAP service. Their geopolitical or language data is not independently corrected by the application.
 
+### Final source verification on 9 October 2026
+
+The final image `country-integration-service:build-d3926df9d2a3c099` rolled out to two ready application pods with zero restarts. MySQL remained ready with zero restarts and the Service had two ready endpoints. Separate pod forwards verified health, readiness, liveness and country reads (200), unsupported content type (415), and unsupported response format (406) on both replicas. `south africa` created through one replica returned 201 with ISO ZA and was visible through the other. Duplicate creation returned 409; an unknown country returned 404. [Recorded evidence](evidence/kubernetes-verification.json) includes pod names, image IDs and endpoint addresses. The final automated run passed 47 tests; see [test results](TEST_RESULTS.md).
+
+The Mac has 8 GB RAM and Docker Desktop exposes about 3.9 GB to containers. The project’s Compose app and MySQL containers were stopped during verification to reduce competing load; their database volume was preserved. Kubernetes remains running. To resume the separate Compose environment, use `docker compose up -d`; allow enough host resources for both environments. This short local check does not establish production capacity or continuous availability.
+
 ## Troubleshooting
 
 | Symptom | Action |
@@ -224,6 +238,27 @@ Creation depends on SOAP. Stored-country reads use MySQL independently of SOAP. 
 
 ## Deployment scope and remaining improvements
 
-This is a verified local Docker Desktop deployment. Both application replicas run on one Kubernetes node. The database has one instance. Multi-node availability, database failover, production backups, automatic scaling, and load capacity have not been verified.
+This is a verified local Docker Desktop deployment. Both application replicas run on one Kubernetes node. The database has one instance. Multi-node availability, database failover, production backups, automatic scaling under load, and load capacity have not been verified.
 
-Production preparation includes versioned schema migrations, reproducible isolated database tests, registry images pinned to immutable versions, managed or highly available MySQL, TLS and API access controls, restricted management endpoints, secret lifecycle management, backup/restore verification, and resource/load testing. The current SOAP endpoint uses HTTP. Review provider HTTPS support before changing it.
+Production preparation includes versioned schema migrations, registry images pinned to immutable versions, managed or highly available MySQL, TLS and API access controls, restricted management endpoints, secret lifecycle management, backup/restore verification, and resource/load testing. The current SOAP endpoint uses HTTP. Review provider HTTPS support before changing it.
+
+## Repeatable API verification
+
+After port-forwarding the Service:
+
+```bash
+./scripts/verify.sh http://localhost:8082
+```
+
+This verifies health, readiness, liveness, stored-country reads, HTTP 415 for a text/plain POST, and HTTP 406 for an unsupported response format. It creates no country records. Repeat against pod-specific forwards to inspect both replicas. Forwarding a Service selects a single pod for that session.
+
+## Optional autoscaling and voluntary disruption protection
+
+```bash
+kubectl --context=docker-desktop apply --dry-run=server -f k8s/optional/autoscaling.yaml
+# Apply only after installing the metrics API and measuring node capacity:
+kubectl --context=docker-desktop apply -f k8s/optional/autoscaling.yaml
+kubectl --context=docker-desktop -n country-integration get hpa,pdb
+```
+
+The HPA targets 70% CPU utilization of requested CPU, with two to four replicas. The PDB keeps at least one app pod available during supported voluntary disruptions. Neither protects the single MySQL instance or provides another node. The optional objects passed server-side validation; autoscaling and disruption behavior have not been exercised. Once HPA manages replicas, avoid repeatedly setting a fixed replica count during normal deployment.

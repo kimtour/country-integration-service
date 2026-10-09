@@ -11,21 +11,9 @@
 	<groupId>com.samkim</groupId>
 	<artifactId>country-integration-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>Country Integration Service</name>
+	<description>REST CRUD service integrating CountryInfo SOAP with MySQL persistence.</description>
+	<url>https://github.com/kimtour/country-integration-service</url>
 	<properties>
 		<java.version>25</java.version>
 	</properties>
@@ -87,6 +75,16 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-mysql</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -98,4 +96,16 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>mysql-it</id>
+			<build><plugins><plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions><execution><goals>
+					<goal>integration-test</goal><goal>verify</goal>
+				</goals></execution></executions>
+			</plugin></plugins></build>
+		</profile>
+	</profiles>
 </project>

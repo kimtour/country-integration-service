@@ -101,4 +101,21 @@ class CountryControllerTest {
 
         verify(service).deleteCountry(2L);
     }
+
+    @Test
+    void rejectsUnsupportedMediaTypeWith415() throws Exception {
+        mvc.perform(post("/api/countries")
+                        .contentType(MediaType.TEXT_PLAIN).content("kenya"))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.status").value(415))
+                .andExpect(jsonPath("$.path").value("/api/countries"));
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void rejectsUnacceptableResponseFormatWith406() throws Exception {
+        mvc.perform(get("/api/countries").accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isNotAcceptable())
+                .andExpect(jsonPath("$.status").value(406));
+    }
 }

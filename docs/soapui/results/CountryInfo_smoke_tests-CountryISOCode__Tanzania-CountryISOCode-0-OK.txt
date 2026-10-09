@@ -1,0 +1,47 @@
+Status: OK
+Time Taken: 7577
+Size: 339
+Timestamp: Fri Oct 09 09:32:53 EAT 2026
+TestStep: CountryISOCode
+
+----------------- Messages ------------------------------
+
+----------------- Properties ------------------------------
+Endpoint: http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso
+Encoding: UTF-8
+
+---------------- Request ---------------------------
+Request Headers: Connection : Keep-Alive
+User-Agent : Apache-HttpClient/4.5.5 (Java/17.0.12)
+Host : webservices.oorsprong.org
+Accept-Encoding : gzip,deflate
+Content-Length : 304
+Content-Type : application/soap+xml;charset=UTF-8
+
+
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:web="http://www.oorsprong.org/websamples.countryinfo">
+   <soap:Header/>
+   <soap:Body>
+      <web:CountryISOCode>
+         <web:sCountryName>Tanzania</web:sCountryName>
+      </web:CountryISOCode>
+   </soap:Body>
+</soap:Envelope>
+
+---------------- Response --------------------------
+Response Headers: Cache-Control : private, max-age=0
+Server : Microsoft-IIS/10.0
+Web-Service : DataFlex 19.1
+#status# : HTTP/1.1 200 OK
+Content-Length : 339
+Date : Fri, 09 Oct 2026 04:51:35 GMT
+Content-Type : application/soap+xml; charset=utf-8
+
+
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+   <soap:Body>
+      <m:CountryISOCodeResponse xmlns:m="http://www.oorsprong.org/websamples.countryinfo">
+         <m:CountryISOCodeResult>TZ</m:CountryISOCodeResult>
+      </m:CountryISOCodeResponse>
+   </soap:Body>
+</soap:Envelope>

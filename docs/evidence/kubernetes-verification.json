@@ -1,0 +1,59 @@
+{
+  "verified_at": "2026-10-09T10:01:56.407106+03:00",
+  "image": "country-integration-service:build-d3926df9d2a3c099",
+  "new_country_status": 201,
+  "new_country_iso": "ZA",
+  "shared_read_status": 200,
+  "shared_read_countries": [
+    "Kenya",
+    "Tanzania",
+    "South Africa"
+  ],
+  "duplicate_and_unknown_statuses": {
+    "south africa": 409,
+    "no such country xyz": 404
+  },
+  "both_replicas_health": 200,
+  "both_replicas_content_type": 415,
+  "both_replicas_response_format": 406,
+  "pods": [
+    {
+      "name": "country-app-66f5c46c-8j68q",
+      "containers": [
+        {
+          "ready": true,
+          "restarts": 0,
+          "image_id": "docker.io/library/country-integration-service@sha256:f9fb72d441f28223000a1993f4aea33d924d7db2cc7133c86049c894afdf72f8"
+        }
+      ]
+    },
+    {
+      "name": "country-app-66f5c46c-d99tg",
+      "containers": [
+        {
+          "ready": true,
+          "restarts": 0,
+          "image_id": "docker.io/library/country-integration-service@sha256:f9fb72d441f28223000a1993f4aea33d924d7db2cc7133c86049c894afdf72f8"
+        }
+      ]
+    },
+    {
+      "name": "mysql-866d9dcf56-jbpmm",
+      "containers": [
+        {
+          "ready": true,
+          "restarts": 0,
+          "image_id": "docker.io/library/mysql@sha256:6ea90827b1100f8f2ae306a539f86d2c264a26ed435a2a9f75551dd5c3aeb242"
+        }
+      ]
+    }
+  ],
+  "ready_endpoints": [
+    [
+      "10.244.0.20"
+    ],
+    [
+      "10.244.0.21"
+    ]
+  ]
+}

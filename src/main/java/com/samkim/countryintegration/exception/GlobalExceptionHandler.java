@@ -13,6 +13,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -111,6 +112,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleUnexpected(
             Exception exception,
             HttpServletRequest request) {
+
+        // Spring framework errors retain their standard status, detail and headers.
+        if (exception instanceof ErrorResponse response) {
+            ProblemDetail problem = response.getBody();
+            addContext(problem, request);
+            return ResponseEntity.status(response.getStatusCode())
+                    .headers(response.getHeaders())
+                    .body(problem);
+        }
 
         log.error(
                 "Request failed: method={} path={}",

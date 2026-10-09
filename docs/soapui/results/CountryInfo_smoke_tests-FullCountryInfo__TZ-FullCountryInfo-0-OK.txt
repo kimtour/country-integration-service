@@ -1,0 +1,61 @@
+Status: OK
+Time Taken: 1145
+Size: 913
+Timestamp: Fri Oct 09 09:33:02 EAT 2026
+TestStep: FullCountryInfo
+
+----------------- Messages ------------------------------
+
+----------------- Properties ------------------------------
+Endpoint: http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso
+Encoding: UTF-8
+
+---------------- Request ---------------------------
+Request Headers: Connection : Keep-Alive
+User-Agent : Apache-HttpClient/4.5.5 (Java/17.0.12)
+Host : webservices.oorsprong.org
+Accept-Encoding : gzip,deflate
+Content-Length : 306
+Content-Type : application/soap+xml;charset=UTF-8
+
+
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:web="http://www.oorsprong.org/websamples.countryinfo">
+   <soap:Header/>
+   <soap:Body>
+      <web:FullCountryInfo>
+         <web:sCountryISOCode>TZ</web:sCountryISOCode>
+      </web:FullCountryInfo>
+   </soap:Body>
+</soap:Envelope>
+
+---------------- Response --------------------------
+Response Headers: Cache-Control : private, max-age=0
+Server : Microsoft-IIS/10.0
+Web-Service : DataFlex 19.1
+#status# : HTTP/1.1 200 OK
+Content-Length : 913
+Date : Fri, 09 Oct 2026 04:51:40 GMT
+Content-Type : application/soap+xml; charset=utf-8
+
+
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+   <soap:Body>
+      <m:FullCountryInfoResponse xmlns:m="http://www.oorsprong.org/websamples.countryinfo">
+         <m:FullCountryInfoResult>
+            <m:sISOCode>TZ</m:sISOCode>
+            <m:sName>Tanzania</m:sName>
+            <m:sCapitalCity>Dar es Salaam</m:sCapitalCity>
+            <m:sPhoneCode>255</m:sPhoneCode>
+            <m:sContinentCode>AF</m:sContinentCode>
+            <m:sCurrencyISOCode>TZS</m:sCurrencyISOCode>
+            <m:sCountryFlag>http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg</m:sCountryFlag>
+            <m:Languages>
+               <m:tLanguage>
+                  <m:sISOCode>swa</m:sISOCode>
+                  <m:sName>Swahili</m:sName>
+               </m:tLanguage>
+            </m:Languages>
+         </m:FullCountryInfoResult>
+      </m:FullCountryInfoResponse>
+   </soap:Body>
+</soap:Envelope>

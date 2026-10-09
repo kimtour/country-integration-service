@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.CountryIntegrationServiceApplicationTests" time="8.214" tests="1" errors="0" skipped="0" failures="0" flakes="0">
+  <testcase name="contextLoads" classname="com.samkim.countryintegration.CountryIntegrationServiceApplicationTests" time="0.008">
+    </testcase>
+</testsuite>

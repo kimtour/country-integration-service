@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-09",
+  "timezone": "Africa/Nairobi",
+  "command": "./mvnw -B -Pmysql-it clean verify",
+  "counts": {
+    "default": 42,
+    "mysql": 5
+  },
+  "results": [
+    {
+      "name": "com.samkim.countryintegration.CountryIntegrationServiceApplicationTests",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "8.214",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "contextLoads"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.controller.CountryControllerTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.022",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "returnsMethodNotAllowedForPostToCountryId",
+        "returnsNotFoundWithClearDetail",
+        "deletesCountryAndReturnsEmptyBody",
+        "rejectsBlankCountryName",
+        "returnsCountryById",
+        "rejectsUnsupportedMediaTypeWith415",
+        "rejectsMalformedJson",
+        "rejectsUnacceptableResponseFormatWith406"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.integration.CountrySoapClientTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.304",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "rejectsSoapFault",
+        "rejectsMalformedXml",
+        "escapesSpecialCharactersInCountryName",
+        "rejectsEmptyIsoCodeResult",
+        "readsCountryFieldsAndMultipleLanguages",
+        "recognizesProvidersUnknownCountryMessage",
+        "malformedIsoCodeStillIndicatesBadUpstreamData",
+        "readsIsoCodeRegardlessOfNamespacePrefix",
+        "rejectsDoctypeAndExternalEntities"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.integration.SoapTransportTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.989",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "retriesAfterTemporaryFailureAndReturnsSuccessfulResponse",
+        "doesNotRetryAnHttp400Response",
+        "opensCircuitAfterRepeatedFailuresAndBlocksNextRequest"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.repository.CountryRepositoryTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "9.516",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "deleteCascadesToLanguages",
+        "replacementRemovesOrphanLanguages",
+        "persistsCountryAndLoadsLanguagesForBothReadPaths",
+        "databaseRejectsDuplicateIsoCodes"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.service.CountryServiceFailureTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.066",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "parsesProviderUnknownMessageBeforeTryingMultiWordFallback",
+        "preservesServiceUnavailableStatus",
+        "mapsInvalidIsoResponseToBadGateway",
+        "preservesUnrelatedDatabaseFailures",
+        "preservesGatewayTimeoutStatus",
+        "mapsInvalidFullCountryResponseToBadGateway",
+        "mapsDuplicateSaveRaceToConflict"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.service.CountryServiceTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.391",
+      "timestamp": "0",
+      "suite": "default",
+      "cases": [
+        "createsCountryUsingNormalizedName",
+        "unknownMultiWordCountryStillReturns404",
+        "updatesDetailsAndReplacesLanguagesWithoutCallingSoap",
+        "unknownSingleWordCountryDoesNotRepeatLookup",
+        "returnsNotFoundForMissingId",
+        "retriesUnknownMultiWordNameWithProviderTitleCase",
+        "rejectsBlankNameBeforeCallingSoap",
+        "normalizesMultiWordNamesToSentenceCase",
+        "deletesExistingCountryWithoutCallingSoap",
+        "rejectsDuplicateCountryBeforeFetchingFullDetails"
+      ]
+    },
+    {
+      "name": "com.samkim.countryintegration.repository.CountryRepositoryMySqlIT",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "70.371",
+      "timestamp": "0",
+      "suite": "mysql",
+      "cases": [
+        "deleteCascadesToLanguages",
+        "replacementRemovesOrphanLanguages",
+        "persistsCountryAndLoadsLanguagesForBothReadPaths",
+        "databaseRejectsDuplicateIsoCodes",
+        "concurrentCreatesReturnOneSuccessAndOneConflict"
+      ]
+    }
+  ]
+}

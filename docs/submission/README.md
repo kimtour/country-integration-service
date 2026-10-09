@@ -1,20 +1,20 @@
 # Case study submission
 
-Prepared by Samuel Mutua Kimani. Use the revised files in this directory; the earlier 10-slide presentation has been replaced.
+Prepared by Samuel Mutua Kimani. Use the current 13-slide presentation and matching PDF; earlier filenames and versions have been replaced.
 
 ## Deliverables
 
-- [PowerPoint presentation, 11 slides](Case_Study_Submission-Integrations_and_Microservices_Engineer-Samuel_Mutua_Kimani.pptx)
-- [Matching PDF, 11 pages](Case_Study_Submission-Integrations_and_Microservices_Engineer-Samuel_Mutua_Kimani.pdf)
+- [PowerPoint, 13 slides](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pptx)
+- [Matching PDF, 13 pages](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
 - Repository: https://github.com/kimtour/country-integration-service
 
-The repository includes implementation, tests, Docker configuration, Kubernetes manifests, the root README, and deployment/troubleshooting documentation. Local credentials and build outputs are excluded.
+The repository includes implementation, 47 verified Maven tests, CI configuration, imported SoapUI project and live evidence, Docker configuration, Kubernetes manifests and deployment/verification scripts, requirement coverage, and deployment/troubleshooting guides. Local credentials and build outputs are excluded.
 
-Initial Kubernetes health and cross-replica persistence checks passed. Later CPU throttling and short probe budgets caused a restart loop. After resource/probe tuning and a serial rollout, both replacement replicas started in about 64 and 49 seconds, returned the saved Kenya and Tanzania data, and completed a five-minute observation with 88 successful health/data requests and zero restarts. The presentation and guides record this recovery. Production availability and load capacity remain unverified.
+The presentation includes the component diagram, test breakdown, SoapUI import screenshot, resilience decisions, local deployment recovery, and remaining production work. Two stateless replicas share one MySQL database. Optional HPA/PDB configuration requires a metrics API and adequate capacity; production availability and load capacity are not established by local tests.
 
 ## Submission
 
-Reply to the original assessment invitation with both presentation files attached and the repository link. The invitation specifies Friday, 9 October 2026, at 3:00 p.m. EAT. This package preparation does not send the email.
+Reply to the original assessment invitation with both files attached and the repository link. Use the exact attachment names in this directory. The invitation specifies **Friday, 9 October 2026, at 3:00 p.m. EAT**, overriding the brief’s general 5 p.m. line. Preparing this package does not send an email.
 
 Suggested reply:
 
@@ -26,7 +26,7 @@ Please find attached my case study presentation and matching PDF for the Integra
 
 GitHub repository: https://github.com/kimtour/country-integration-service
 
-The repository includes the implementation, automated tests, Docker and Kubernetes configuration, and instructions for running, testing, and troubleshooting the application. The presentation and documentation cover the verified results, current limitations, and proposed production improvements.
+The repository includes the source code, automated tests and evidence, SoapUI project, Docker and Kubernetes configuration, deployment scripts, and instructions for running, testing, and troubleshooting the application. The presentation explains the implementation, verified results, design trade-offs, and remaining production improvements.
 
 Kind regards,
 Samuel Mutua Kimani
