@@ -12,6 +12,9 @@ public interface CountryRepository extends JpaRepository<CountryInfo, Long> {
 
     Optional<CountryInfo> findByIsoCode(String isoCode);
 
+    @EntityGraph(attributePaths = "languages")
+    List<CountryInfo> findByIdIn(List<Long> ids);
+
     @Override
     @EntityGraph(attributePaths = "languages")
     List<CountryInfo> findAll();

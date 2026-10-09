@@ -34,7 +34,7 @@ No live database or password is required. To verify against a temporary real MyS
 ./mvnw -Pmysql-it clean verify
 ```
 
-42 default tests and 5 MySQL integration tests pass. The latter verifies persistence, eager language loading, replacement/orphan cleanup, cascading deletion, unique ISO codes, and concurrent duplicate handling. See [test evidence](TEST_RESULTS.md). Testcontainers creates a separate database and cleans it up; existing country data is untouched.
+55 default tests and 9 MySQL integration tests pass. The latter verifies persistence, eager language loading, replacement/orphan cleanup, cascading deletion, unique ISO codes, and concurrent duplicate handling. See [test evidence](TEST_RESULTS.md). Testcontainers creates a separate database and cleans it up; existing country data is untouched.
 
 For `./mvnw spring-boot:run`, start Compose MySQL and export DB_PASSWORD matching `.env`. Compose reads `.env`; Maven does not load it automatically.
 
@@ -115,7 +115,7 @@ Build the application image from source:
 docker build -t country-integration-service:$(python3 scripts/image-tag.py) .
 ```
 
-For a fresh database, begin with `replicas: 1` in k8s/app.yaml. The current application creates its schema with Hibernate ddl-auto=update. After the first pod has initialized the schema successfully, set replicas to 2 and reapply. Explicit database migrations are a production improvement still to implement.
+Fresh databases run Flyway V1 automatically and Hibernate validates the resulting schema. The script deploys one replica for migration before scaling to two. For an existing pre-Flyway schema, run `./scripts/backup-db.sh` first, then `BASELINE_EXISTING_SCHEMA=true ./scripts/deploy.sh`. This explicitly records baseline version 1 while preserving data. Confirm validation and data, then set `DB_BASELINE_ON_MIGRATE=false` and return to normal deployment. Never use baseline to conceal an incompatible schema.
 
 ```bash
 kubectl --context=docker-desktop apply -f k8s/app.yaml
@@ -201,7 +201,9 @@ Country responses reproduce fields supplied by the external SOAP service. Their 
 
 ### Final source verification on 9 October 2026
 
-The final image `country-integration-service:build-d3926df9d2a3c099` rolled out to two ready application pods with zero restarts. MySQL remained ready with zero restarts and the Service had two ready endpoints. Separate pod forwards verified health, readiness, liveness and country reads (200), unsupported content type (415), and unsupported response format (406) on both replicas. `south africa` created through one replica returned 201 with ISO ZA and was visible through the other. Duplicate creation returned 409; an unknown country returned 404. [Recorded evidence](evidence/kubernetes-verification.json) includes pod names, image IDs and endpoint addresses. The final automated run passed 47 tests; see [test results](TEST_RESULTS.md).
+The source-built image `country-integration-service:build-b3d64cbfb5ab61f8` rolled out to two ready application pods with zero restarts. MySQL remained ready with zero restarts and the Service had two ready endpoints. Both replicas returned health, readiness and liveness 200 UP. Guinea-Bissau (GW), Papua-New Guinea (PG), and Moldova (MD) each returned 201 through the first replica and were readable through the second. Existing Kenya, Tanzania and South Africa records survived schema adoption. Duplicate creation returned 409; an unknown country returned 404; bounded pagination returned 200 and invalid bounds returned 400. [Recorded evidence](evidence/kubernetes-verification.json) includes pod identities, image IDs, endpoints and API responses. The final automated run passed 55 default tests plus nine actual MySQL tests (64 total); see [test results](TEST_RESULTS.md).
+
+Prometheus discovered two healthy application targets and loaded availability/error alert rules; Grafana's provisioned dashboard was reachable. An internal Service read workload returned 200 for all 200 requests, distributed 101/99 between replicas. A private backup restored into disposable MySQL with all six countries, six languages and one successful schema-history entry. See the [monitoring](evidence/monitoring-verification.json), [load](evidence/load-results.json), and [restore](evidence/backup-restore-verification.json) evidence. These are bounded local checks, not proof of production capacity or high availability.
 
 The Mac has 8 GB RAM and Docker Desktop exposes about 3.9 GB to containers. The project’s Compose app and MySQL containers were stopped during verification to reduce competing load; their database volume was preserved. Kubernetes remains running. To resume the separate Compose environment, use `docker compose up -d`; allow enough host resources for both environments. This short local check does not establish production capacity or continuous availability.
 
@@ -234,13 +236,13 @@ kubectl --context=docker-desktop -n country-integration get events --sort-by=.la
 kubectl --context=docker-desktop get storageclass
 ```
 
-Creation depends on SOAP. Stored-country reads use MySQL independently of SOAP. The transport retries eligible failures, applies a circuit breaker, and returns an explicit error when upstream information is unavailable. Logs include request IDs; HTTP metrics are exposed through Actuator. Prometheus scraping and dashboards have not been demonstrated.
+Creation depends on SOAP. Stored-country reads use MySQL independently of SOAP. The transport retries eligible failures, applies a circuit breaker, and returns an explicit error when upstream information is unavailable. Logs include request IDs; HTTP metrics are exposed through Actuator. Optional Prometheus scraping, evaluated alert rules and Grafana provisioning are supplied in `k8s/optional/monitoring.yaml`; notification routing remains outside this local configuration.
 
 ## Deployment scope and remaining improvements
 
 This is a verified local Docker Desktop deployment. Both application replicas run on one Kubernetes node. The database has one instance. Multi-node availability, database failover, production backups, automatic scaling under load, and load capacity have not been verified.
 
-Production preparation includes versioned schema migrations, registry images pinned to immutable versions, managed or highly available MySQL, TLS and API access controls, restricted management endpoints, secret lifecycle management, backup/restore verification, and resource/load testing. The current SOAP endpoint uses HTTP. Review provider HTTPS support before changing it.
+Versioned migrations and schema validation are implemented. Production preparation still includes registry images pinned to immutable versions, managed or highly available MySQL, TLS and API access controls, restricted management endpoints, secret lifecycle management, production recovery exercises, and sustained resource/load testing. The current SOAP endpoint uses HTTP. Review provider HTTPS support before changing it.
 
 ## Repeatable API verification
 
@@ -262,3 +264,51 @@ kubectl --context=docker-desktop -n country-integration get hpa,pdb
 ```
 
 The HPA targets 70% CPU utilization of requested CPU, with two to four replicas. The PDB keeps at least one app pod available during supported voluntary disruptions. Neither protects the single MySQL instance or provides another node. The optional objects passed server-side validation; autoscaling and disruption behavior have not been exercised. Once HPA manages replicas, avoid repeatedly setting a fixed replica count during normal deployment.
+
+## Final improvements on 9 October 2026
+
+- Sentence-case lookup remains the first attempt. Punctuation-aware title case handles Guinea-Bissau and Papua-New Guinea; a six-hour provider catalogue cache supplies exact canonical spelling where needed. Provider connection failures never trigger name-format retries.
+- GET `/api/countries?page=0&size=100` returns a bounded JSON array. Page is zero-based; size is 1–100. Read pages until an empty array for the complete collection.
+- A 20-second budget covers the synchronous SOAP sequence, including eligible retries. It does not bound database operations or servlet scheduling. Request timeout is capped by remaining budget; exhaustion returns 504.
+- Structured business logs share the existing request ID. They record resolved ISO, duplicate detection, saved ID, failures, and flushed update/delete outcomes. Request bodies and credentials are excluded. Custom metrics are `country.operations` and `country.import.duration`.
+- `IMAGE_LOAD_MODE=auto` supports local Docker Desktop, kind import and minikube import. Remote contexts require explicit registry `APP_IMAGE` and `PUSH_IMAGE=true`. Verify registry access and storage class separately.
+
+### Schema adoption and backup
+
+```bash
+./scripts/backup-db.sh
+BASELINE_EXISTING_SCHEMA=true ./scripts/deploy.sh
+# After validating Flyway history and preserved data:
+kubectl --context=docker-desktop -n country-integration set env deployment/country-app DB_BASELINE_ON_MIGRATE=false
+```
+
+The backup command uses MySQL's existing pod credentials without printing them and writes an owner-only gzip under ignored `target/backups`. Move private backups to protected storage before `mvn clean`. A local restore was verified in disposable MySQL: six countries, six languages and one successful schema-history entry were recovered. Reproduce the isolated check with:
+
+```bash
+python3 scripts/test-backup-restore.py target/backups/countrydb-YYYYMMDD-HHMMSS.sql.gz \
+  --expected-iso KE,TZ,ZA,GW,PG,MD \
+  --output target/backup-restore-verification.json
+```
+
+Supply the ISO codes expected in your own backup. The script removes its test container and never imports into the application database. This check does not establish production RTO/RPO, storage recovery or HA. For an existing Compose schema, set `DB_BASELINE_ON_MIGRATE=true` once after backup, then return to false. Do not delete volumes to bypass schema errors.
+
+### Monitoring
+
+```bash
+kubectl --context=docker-desktop apply -f k8s/optional/monitoring.yaml
+kubectl --context=docker-desktop -n country-integration rollout status deployment/country-prometheus
+kubectl --context=docker-desktop -n country-integration rollout status deployment/country-grafana
+kubectl --context=docker-desktop -n country-integration port-forward service/country-prometheus 9090:9090
+# Another terminal:
+kubectl --context=docker-desktop -n country-integration port-forward service/country-grafana 3000:3000
+```
+
+Prometheus discovers namespace application pods and evaluates availability/error rules. Grafana provisions the service dashboard with HTTP latency/rate, import duration and business outcomes. Anonymous Viewer is enabled for this internal local setup; access controls, persistent storage and notification destinations must be configured before wider use. See `docs/evidence/monitoring-verification.json` for observed targets/dashboard state. This 8 GB laptop has a 4 GB Docker allocation; avoid running Compose, integration test containers and monitoring simultaneously when measuring Kubernetes.
+
+### Read workload
+
+```bash
+python3 scripts/load-test.py --requests 200 --concurrency 8 --output target/load-results.json
+```
+
+This reads data and records request rate, p50/p95/max latency, statuses and X-Instance-ID distribution. A Service port-forward remains bound to a single pod; use `./scripts/load-test-k8s.sh` for an internal ClusterIP Service distribution test. The recorded local sample is in `docs/evidence/load-results.json`. The local cluster has no metrics API, so the optional HPA cannot demonstrate autoscaling here. A metrics-server-enabled multi-node environment, sustained mixed load and failure testing are still needed for production capacity/HA claims.

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.integration.SoapTransportTest" time="2.989" tests="3" errors="0" skipped="0" failures="0" flakes="0">
-  <testcase name="retriesAfterTemporaryFailureAndReturnsSuccessfulResponse" classname="com.samkim.countryintegration.integration.SoapTransportTest" time="1.349">
-    </testcase>
-  <testcase name="doesNotRetryAnHttp400Response" classname="com.samkim.countryintegration.integration.SoapTransportTest" time="0.026">
-    </testcase>
-  <testcase name="opensCircuitAfterRepeatedFailuresAndBlocksNextRequest" classname="com.samkim.countryintegration.integration.SoapTransportTest" time="1.605">
-    </testcase>
+<testsuite name="com.samkim.countryintegration.integration.SoapTransportTest" tests="6" failures="0" errors="0" skipped="0" time="7.604">
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="actualHttpTimeoutReturns504" />
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="halfOpenCircuitClosesAfterSuccessfulRecoveryCalls" />
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="expiredImportBudgetDoesNotSendRequestAndIsCleared" />
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="retriesAfterTemporaryFailureAndReturnsSuccessfulResponse" />
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="doesNotRetryAnHttp400Response" />
+  <testcase classname="com.samkim.countryintegration.integration.SoapTransportTest" name="opensCircuitAfterRepeatedFailuresAndBlocksNextRequest" />
 </testsuite>

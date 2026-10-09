@@ -118,4 +118,43 @@ class CountryControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andExpect(jsonPath("$.status").value(406));
     }
+    @Test
+    void createsCountryWith201AndLocation() throws Exception {
+        CountryInfo country = mock(CountryInfo.class);
+        when(country.getId()).thenReturn(7L);
+        when(country.getIsoCode()).thenReturn("GW");
+        when(service.createCountry("guinea-bissau")).thenReturn(country);
+        mvc.perform(post("/api/countries").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"guinea-bissau\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/countries/7"))
+                .andExpect(jsonPath("$.isoCode").value("GW"));
+    }
+
+    @Test
+    void updatesCountryAndReturns200() throws Exception {
+        when(service.updateCountry(eq(7L), any())).thenReturn(new CountryInfo("GW", "Guinea-Bissau"));
+        mvc.perform(put("/api/countries/7").contentType(MediaType.APPLICATION_JSON).content("""
+                {"name":"Guinea-Bissau","capitalCity":"Bissau","phoneCode":"245",
+                 "continentCode":"AF","currencyIsoCode":"XOF","languages":[]}
+                """))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.isoCode").value("GW"));
+        verify(service).updateCountry(eq(7L), any());
+    }
+
+    @Test
+    void rejectsInvalidUpdateWithoutCallingService() throws Exception {
+        mvc.perform(put("/api/countries/7").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"\"}"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void passesPageAndSizeToService() throws Exception {
+        when(service.getCountries(2, 5)).thenReturn(java.util.List.of(new CountryInfo("GW", "Guinea-Bissau")));
+        mvc.perform(get("/api/countries?page=2&size=5"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].isoCode").value("GW"));
+        verify(service).getCountries(2, 5);
+    }
 }

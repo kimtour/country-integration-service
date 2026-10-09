@@ -1,0 +1,22 @@
+{
+  "requests": 200,
+  "concurrency": 8,
+  "seconds": 21.118,
+  "requests_per_second": 9.471,
+  "statuses": {
+    "200": 200
+  },
+  "latency_ms": {
+    "p50": 449.737,
+    "p95": 3105.999,
+    "max": 4874.325
+  },
+  "instances": {
+    "country-app-74fb9968d6-dg9jn": 101,
+    "country-app-74fb9968d6-9hz54": 99
+  },
+  "scope": "Local read workload; does not establish maximum throughput, HA or production capacity.",
+  "date": "2026-10-09",
+  "route": "Temporary Python pod -> http://country-app:8080/api/countries?page=0&size=50",
+  "environment": "One Docker Desktop node, 8 GB host, about 4 GB Docker allocation; 2 application replicas and one MySQL; monitoring and desktop tasks shared resources."
+}

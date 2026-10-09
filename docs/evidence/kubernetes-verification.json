@@ -1,39 +1,24 @@
 {
-  "verified_at": "2026-10-09T10:01:56.407106+03:00",
-  "image": "country-integration-service:build-d3926df9d2a3c099",
-  "new_country_status": 201,
-  "new_country_iso": "ZA",
-  "shared_read_status": 200,
-  "shared_read_countries": [
-    "Kenya",
-    "Tanzania",
-    "South Africa"
-  ],
-  "duplicate_and_unknown_statuses": {
-    "south africa": 409,
-    "no such country xyz": 404
-  },
-  "both_replicas_health": 200,
-  "both_replicas_content_type": 415,
-  "both_replicas_response_format": 406,
+  "date": "2026-10-09T13:04:42.904346+03:00",
+  "image": "build-b3d64cbfb5ab61f8",
   "pods": [
     {
-      "name": "country-app-66f5c46c-8j68q",
+      "name": "country-app-74fb9968d6-9hz54",
       "containers": [
         {
           "ready": true,
           "restarts": 0,
-          "image_id": "docker.io/library/country-integration-service@sha256:f9fb72d441f28223000a1993f4aea33d924d7db2cc7133c86049c894afdf72f8"
+          "image_id": "docker.io/library/country-integration-service@sha256:27a5b62786af2898b97f88bc66ee7e9cb184188793beef28579bbd52c6fcbfd6"
         }
       ]
     },
     {
-      "name": "country-app-66f5c46c-d99tg",
+      "name": "country-app-74fb9968d6-dg9jn",
       "containers": [
         {
           "ready": true,
           "restarts": 0,
-          "image_id": "docker.io/library/country-integration-service@sha256:f9fb72d441f28223000a1993f4aea33d924d7db2cc7133c86049c894afdf72f8"
+          "image_id": "docker.io/library/country-integration-service@sha256:27a5b62786af2898b97f88bc66ee7e9cb184188793beef28579bbd52c6fcbfd6"
         }
       ]
     },
@@ -48,12 +33,683 @@
       ]
     }
   ],
-  "ready_endpoints": [
-    [
-      "10.244.0.20"
-    ],
-    [
-      "10.244.0.21"
-    ]
-  ]
+  "endpoints": [
+    {
+      "name": "country-app-9rmfn",
+      "addresses": [
+        {
+          "addresses": [
+            "10.244.0.26"
+          ],
+          "ready": true,
+          "pod": "country-app-74fb9968d6-dg9jn"
+        },
+        {
+          "addresses": [
+            "10.244.0.27"
+          ],
+          "ready": true,
+          "pod": "country-app-74fb9968d6-9hz54"
+        }
+      ]
+    }
+  ],
+  "api_checks": [
+    {
+      "port": 8083,
+      "method": "GET",
+      "path": "/actuator/health",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "groups": [
+          "liveness",
+          "readiness"
+        ],
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8083,
+      "method": "GET",
+      "path": "/actuator/health/readiness",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8083,
+      "method": "GET",
+      "path": "/actuator/health/liveness",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8083,
+      "method": "GET",
+      "path": "/api/countries",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        },
+        {
+          "isoCode": "ZA",
+          "name": "South Africa",
+          "capitalCity": "Cape Town",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/South_Africa.jpg",
+          "currencyIsoCode": "ZAR",
+          "id": 3,
+          "languages": [
+            {
+              "isoCode": "eng",
+              "name": "English",
+              "id": 3
+            }
+          ],
+          "phoneCode": "27"
+        }
+      ]
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/actuator/health",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": {
+        "groups": [
+          "liveness",
+          "readiness"
+        ],
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/actuator/health/readiness",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": {
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/actuator/health/liveness",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": {
+        "status": "UP"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        },
+        {
+          "isoCode": "ZA",
+          "name": "South Africa",
+          "capitalCity": "Cape Town",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/South_Africa.jpg",
+          "currencyIsoCode": "ZAR",
+          "id": 3,
+          "languages": [
+            {
+              "isoCode": "eng",
+              "name": "English",
+              "id": 3
+            }
+          ],
+          "phoneCode": "27"
+        }
+      ]
+    },
+    {
+      "port": 8083,
+      "method": "POST",
+      "path": "/api/countries",
+      "status": 201,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "isoCode": "GW",
+        "name": "Guinea-Bissau",
+        "capitalCity": "Bissau",
+        "continentCode": "AF",
+        "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Guinea-B.jpg",
+        "currencyIsoCode": "XOF",
+        "id": 4,
+        "languages": [
+          {
+            "isoCode": "por",
+            "name": "Portuguese",
+            "id": 4
+          }
+        ],
+        "phoneCode": "225"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        },
+        {
+          "isoCode": "ZA",
+          "name": "South Africa",
+          "capitalCity": "Cape Town",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/South_Africa.jpg",
+          "currencyIsoCode": "ZAR",
+          "id": 3,
+          "languages": [
+            {
+              "isoCode": "eng",
+              "name": "English",
+              "id": 3
+            }
+          ],
+          "phoneCode": "27"
+        },
+        {
+          "isoCode": "GW",
+          "name": "Guinea-Bissau",
+          "capitalCity": "Bissau",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Guinea-B.jpg",
+          "currencyIsoCode": "XOF",
+          "id": 4,
+          "languages": [
+            {
+              "isoCode": "por",
+              "name": "Portuguese",
+              "id": 4
+            }
+          ],
+          "phoneCode": "225"
+        }
+      ]
+    },
+    {
+      "port": 8083,
+      "method": "POST",
+      "path": "/api/countries",
+      "status": 201,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "isoCode": "PG",
+        "name": "Papua-New Guinea",
+        "capitalCity": "Port Moresby",
+        "continentCode": "OC",
+        "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Papua-New_Guinea.jpg",
+        "currencyIsoCode": "PGK",
+        "id": 5,
+        "languages": [
+          {
+            "isoCode": "fr",
+            "name": "French",
+            "id": 5
+          }
+        ],
+        "phoneCode": "675"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        },
+        {
+          "isoCode": "ZA",
+          "name": "South Africa",
+          "capitalCity": "Cape Town",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/South_Africa.jpg",
+          "currencyIsoCode": "ZAR",
+          "id": 3,
+          "languages": [
+            {
+              "isoCode": "eng",
+              "name": "English",
+              "id": 3
+            }
+          ],
+          "phoneCode": "27"
+        },
+        {
+          "isoCode": "GW",
+          "name": "Guinea-Bissau",
+          "capitalCity": "Bissau",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Guinea-B.jpg",
+          "currencyIsoCode": "XOF",
+          "id": 4,
+          "languages": [
+            {
+              "isoCode": "por",
+              "name": "Portuguese",
+              "id": 4
+            }
+          ],
+          "phoneCode": "225"
+        },
+        {
+          "isoCode": "PG",
+          "name": "Papua-New Guinea",
+          "capitalCity": "Port Moresby",
+          "continentCode": "OC",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Papua-New_Guinea.jpg",
+          "currencyIsoCode": "PGK",
+          "id": 5,
+          "languages": [
+            {
+              "isoCode": "fr",
+              "name": "French",
+              "id": 5
+            }
+          ],
+          "phoneCode": "675"
+        }
+      ]
+    },
+    {
+      "port": 8083,
+      "method": "POST",
+      "path": "/api/countries",
+      "status": 201,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "isoCode": "MD",
+        "name": "Moldova, Republic of",
+        "capitalCity": "Kishinev",
+        "continentCode": "EU",
+        "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Moldova.jpg",
+        "currencyIsoCode": "MDL",
+        "id": 6,
+        "languages": [
+          {
+            "isoCode": "ro",
+            "name": "Romanian",
+            "id": 6
+          }
+        ],
+        "phoneCode": "373"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        },
+        {
+          "isoCode": "ZA",
+          "name": "South Africa",
+          "capitalCity": "Cape Town",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/South_Africa.jpg",
+          "currencyIsoCode": "ZAR",
+          "id": 3,
+          "languages": [
+            {
+              "isoCode": "eng",
+              "name": "English",
+              "id": 3
+            }
+          ],
+          "phoneCode": "27"
+        },
+        {
+          "isoCode": "GW",
+          "name": "Guinea-Bissau",
+          "capitalCity": "Bissau",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Guinea-B.jpg",
+          "currencyIsoCode": "XOF",
+          "id": 4,
+          "languages": [
+            {
+              "isoCode": "por",
+              "name": "Portuguese",
+              "id": 4
+            }
+          ],
+          "phoneCode": "225"
+        },
+        {
+          "isoCode": "PG",
+          "name": "Papua-New Guinea",
+          "capitalCity": "Port Moresby",
+          "continentCode": "OC",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Papua-New_Guinea.jpg",
+          "currencyIsoCode": "PGK",
+          "id": 5,
+          "languages": [
+            {
+              "isoCode": "fr",
+              "name": "French",
+              "id": 5
+            }
+          ],
+          "phoneCode": "675"
+        },
+        {
+          "isoCode": "MD",
+          "name": "Moldova, Republic of",
+          "capitalCity": "Kishinev",
+          "continentCode": "EU",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Moldova.jpg",
+          "currencyIsoCode": "MDL",
+          "id": 6,
+          "languages": [
+            {
+              "isoCode": "ro",
+              "name": "Romanian",
+              "id": 6
+            }
+          ],
+          "phoneCode": "373"
+        }
+      ]
+    },
+    {
+      "port": 8083,
+      "method": "POST",
+      "path": "/api/countries",
+      "status": 409,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "detail": "Country already exists with ISO code GW",
+        "instance": "/api/countries",
+        "status": 409,
+        "title": "Conflict",
+        "timestamp": "2026-10-09T10:04:13.573633389Z",
+        "path": "/api/countries"
+      }
+    },
+    {
+      "port": 8083,
+      "method": "POST",
+      "path": "/api/countries",
+      "status": 404,
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "body": {
+        "detail": "Country was not found",
+        "instance": "/api/countries",
+        "status": 404,
+        "title": "Not Found",
+        "timestamp": "2026-10-09T10:04:29.707368173Z",
+        "path": "/api/countries"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries?page=0&size=2",
+      "status": 200,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": [
+        {
+          "isoCode": "KE",
+          "name": "Kenya",
+          "capitalCity": "Nairobi",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Kenya.jpg",
+          "currencyIsoCode": "KES",
+          "id": 1,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 1
+            }
+          ],
+          "phoneCode": "254"
+        },
+        {
+          "isoCode": "TZ",
+          "name": "Tanzania",
+          "capitalCity": "Dar es Salaam",
+          "continentCode": "AF",
+          "countryFlag": "http://www.oorsprong.org/WebSamples.CountryInfo/Flags/Tanzania.jpg",
+          "currencyIsoCode": "TZS",
+          "id": 2,
+          "languages": [
+            {
+              "isoCode": "swa",
+              "name": "Swahili",
+              "id": 2
+            }
+          ],
+          "phoneCode": "255"
+        }
+      ]
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries?page=-1&size=2",
+      "status": 400,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": {
+        "detail": "page must be non-negative and size must be between 1 and 100",
+        "instance": "/api/countries",
+        "status": 400,
+        "title": "Bad Request",
+        "timestamp": "2026-10-09T10:04:36.089223051Z",
+        "path": "/api/countries"
+      }
+    },
+    {
+      "port": 8084,
+      "method": "GET",
+      "path": "/api/countries?page=0&size=101",
+      "status": 400,
+      "instance": "country-app-74fb9968d6-9hz54",
+      "body": {
+        "detail": "page must be non-negative and size must be between 1 and 100",
+        "instance": "/api/countries",
+        "status": 400,
+        "title": "Bad Request",
+        "timestamp": "2026-10-09T10:04:39.952391595Z",
+        "path": "/api/countries"
+      }
+    }
+  ],
+  "scope": "Two replicas on one local Docker Desktop node; existing KE/TZ/ZA preserved; no HA or production capacity claim.",
+  "schema_history_and_saved_countries": [
+    "1\tBASELINE\t1",
+    "KE\tKenya",
+    "TZ\tTanzania",
+    "ZA\tSouth Africa",
+    "GW\tGuinea-Bissau",
+    "PG\tPapua-New Guinea",
+    "MD\tMoldova, Republic of"
+  ],
+  "baseline_on_migrate_after_adoption": "false"
 }

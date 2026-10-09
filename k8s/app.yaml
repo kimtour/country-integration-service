@@ -40,7 +40,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: country-integration-service:build-d3926df9d2a3c099
+          image: country-integration-service:build-b3d64cbfb5ab61f8
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -49,6 +49,10 @@ spec:
             - configMapRef:
                 name: country-app-config
           env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

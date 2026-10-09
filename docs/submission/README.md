@@ -1,16 +1,16 @@
 # Case study submission
 
-Prepared by Samuel Mutua Kimani. Use the current 13-slide presentation and matching PDF; earlier filenames and versions have been replaced.
+Prepared by Samuel Mutua Kimani. Use the current 18-slide presentation and matching PDF; earlier filenames and versions have been replaced.
 
 ## Deliverables
 
-- [PowerPoint, 13 slides](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pptx)
-- [Matching PDF, 13 pages](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
+- [PowerPoint, 18 slides](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pptx)
+- [Matching PDF, 18 pages](Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
 - Repository: https://github.com/kimtour/country-integration-service
 
-The repository includes implementation, 47 verified Maven tests, CI configuration, imported SoapUI project and live evidence, Docker configuration, Kubernetes manifests and deployment/verification scripts, requirement coverage, and deployment/troubleshooting guides. Local credentials and build outputs are excluded.
+The repository includes implementation, 64 verified Maven tests, CI configuration, imported SoapUI project and live evidence, Docker configuration, Kubernetes manifests and deployment/verification scripts, requirement coverage, and deployment/troubleshooting guides. Local credentials and build outputs are excluded.
 
-The presentation includes the component diagram, test breakdown, SoapUI import screenshot, resilience decisions, local deployment recovery, and remaining production work. Two stateless replicas share one MySQL database. Optional HPA/PDB configuration requires a metrics API and adequate capacity; production availability and load capacity are not established by local tests.
+The presentation includes the component diagram, test breakdown, SoapUI import and request evidence, resilience decisions, local deployment recovery, and remaining production work. Two stateless replicas share one MySQL database. Optional HPA/PDB configuration requires a metrics API and adequate capacity; production availability and load capacity are not established by local tests.
 
 ## Submission
 

@@ -36,6 +36,7 @@ services:
     environment:
       DB_URL: jdbc:mysql://mysql:3306/countrydb
       DB_USERNAME: countryapp
+      DB_BASELINE_ON_MIGRATE: ${DB_BASELINE_ON_MIGRATE:-false}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     ports:
       - "127.0.0.1:8081:8080"

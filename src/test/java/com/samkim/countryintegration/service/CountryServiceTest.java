@@ -97,6 +97,8 @@ class CountryServiceTest {
                 () -> service.createCountry("unknown"));
         assertEquals(HttpStatus.NOT_FOUND, failure.getStatusCode());
         verify(soapClient, times(1)).fetchIsoCode("Unknown");
+        verify(soapClient).beginImport();
+        verify(soapClient).findCanonicalCountryName("Unknown");
         verifyNoMoreInteractions(soapClient);
         verifyNoInteractions(repository);
     }
@@ -181,6 +183,53 @@ class CountryServiceTest {
         verify(repository).delete(country);
         verify(repository).flush();
         verifyNoInteractions(soapClient);
+    }
+
+    @Test
+    void resolvesHyphenatedCountryNames() {
+        for (String[] sample : List.of(new String[]{"guinea-bissau", "Guinea-bissau", "Guinea-Bissau", "GW"},
+                new String[]{"papua-new guinea", "Papua-new guinea", "Papua-New Guinea", "PG"})) {
+            CountryInfo country = new CountryInfo(sample[3], sample[2]);
+            when(soapClient.fetchIsoCode(sample[1])).thenThrow(new IllegalArgumentException("Unknown"));
+            when(soapClient.fetchIsoCode(sample[2])).thenReturn(sample[3]);
+            when(repository.findByIsoCode(sample[3])).thenReturn(Optional.empty());
+            when(soapClient.fetchFullCountryInfo(sample[3])).thenReturn(country);
+            when(repository.saveAndFlush(country)).thenReturn(country);
+            assertSame(country, service.createCountry(sample[0]));
+        }
+    }
+
+    @Test
+    void usesCanonicalProviderSpellingWhenTitleCaseStillFails() {
+        when(soapClient.fetchIsoCode("Moldova, republic of")).thenThrow(new IllegalArgumentException("Unknown"));
+        when(soapClient.fetchIsoCode("Moldova, Republic Of")).thenThrow(new IllegalArgumentException("Unknown"));
+        when(soapClient.findCanonicalCountryName("Moldova, republic of"))
+                .thenReturn(Optional.of("Moldova, Republic of"));
+        when(soapClient.fetchIsoCode("Moldova, Republic of")).thenReturn("MD");
+        CountryInfo country = new CountryInfo("MD", "Moldova, Republic of");
+        when(repository.findByIsoCode("MD")).thenReturn(Optional.empty());
+        when(soapClient.fetchFullCountryInfo("MD")).thenReturn(country);
+        when(repository.saveAndFlush(country)).thenReturn(country);
+        assertSame(country, service.createCountry("MOLDOVA, REPUBLIC OF"));
+    }
+
+    @Test
+    void upstreamFailureDoesNotTriggerNameFallback() {
+        ResponseStatusException failure = new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT);
+        when(soapClient.fetchIsoCode("Guinea-bissau")).thenThrow(failure);
+        assertSame(failure, assertThrows(ResponseStatusException.class,
+                () -> service.createCountry("guinea-bissau")));
+        verify(soapClient, never()).findCanonicalCountryName(any());
+        verify(soapClient, never()).fetchIsoCode("Guinea-Bissau");
+    }
+
+    @Test
+    void rejectsInvalidPagination() {
+        assertEquals(HttpStatus.BAD_REQUEST, assertThrows(ResponseStatusException.class,
+                () -> service.getCountries(-1, 20)).getStatusCode());
+        assertThrows(ResponseStatusException.class, () -> service.getCountries(0, 101));
+        assertThrows(ResponseStatusException.class, () -> service.getCountries(0, 0));
+        verifyNoInteractions(repository);
     }
 
     private CountryInfo kenya() {

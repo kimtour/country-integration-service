@@ -9,6 +9,7 @@ import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.function.Supplier;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,18 @@ public class SoapTransport {
     private final URI endpoint;
     private final Retry retry;
     private final CircuitBreaker circuitBreaker;
+    private final Duration requestTimeout;
+    private final Duration importTimeout;
+    private final ThreadLocal<Long> importDeadline = new ThreadLocal<>();
 
+    @Autowired
     public SoapTransport(@Value("${country.soap.url}") String url) {
+        this(url, Duration.ofSeconds(8), Duration.ofSeconds(30), Duration.ofSeconds(20));
+    }
+
+    SoapTransport(String url, Duration requestTimeout, Duration openDuration, Duration importTimeout) {
+        this.requestTimeout = requestTimeout;
+        this.importTimeout = importTimeout;
         this.endpoint = URI.create(url);
 
         this.client = HttpClient.newBuilder()
@@ -56,7 +67,7 @@ public class SoapTransport {
                 .slidingWindowSize(10)
                 .minimumNumberOfCalls(5)
                 .failureRateThreshold(50)
-                .waitDurationInOpenState(Duration.ofSeconds(30))
+                .waitDurationInOpenState(openDuration)
                 .permittedNumberOfCallsInHalfOpenState(2)
                 .recordException(exception ->
                         exception instanceof SoapFailure failure
@@ -79,6 +90,35 @@ public class SoapTransport {
                 log.warn(
                         "SOAP circuit state changed: transition={}",
                         event.getStateTransition()));
+    }
+
+    public ImportBudget beginImport() {
+        Long previous = importDeadline.get();
+        long deadline = System.nanoTime() + importTimeout.toNanos();
+        importDeadline.set(previous == null ? deadline : Math.min(previous, deadline));
+        return new ImportBudget(previous);
+    }
+
+    public final class ImportBudget implements AutoCloseable {
+        private final Long previous;
+        private ImportBudget(Long previous) { this.previous = previous; }
+        @Override public void close() {
+            if (previous == null) importDeadline.remove();
+            else importDeadline.set(previous);
+        }
+    }
+
+    CircuitBreaker circuitBreaker() { return circuitBreaker; }
+
+    private Duration remainingRequestTime() {
+        Long deadline = importDeadline.get();
+        if (deadline == null) return requestTimeout;
+        long remaining = deadline - System.nanoTime();
+        if (remaining <= 0) {
+            throw new SoapFailure(HttpStatus.GATEWAY_TIMEOUT,
+                    "Country import exceeded its SOAP time budget", false, null);
+        }
+        return Duration.ofNanos(Math.min(remaining, requestTimeout.toNanos()));
     }
 
     public String send(String envelope) {
@@ -113,7 +153,7 @@ public class SoapTransport {
 
     private String sendOnce(String envelope) {
         HttpRequest request = HttpRequest.newBuilder(endpoint)
-                .timeout(Duration.ofSeconds(8))
+                .timeout(remainingRequestTime())
                 .header("Content-Type", "text/xml; charset=utf-8")
                 .header("SOAPAction", "\"\"")
                 .POST(HttpRequest.BodyPublishers.ofString(

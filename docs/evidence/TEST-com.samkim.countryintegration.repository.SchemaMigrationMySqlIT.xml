@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.samkim.countryintegration.repository.SchemaMigrationMySqlIT" tests="3" failures="0" errors="0" skipped="0" time="394.25">
+  <testcase classname="com.samkim.countryintegration.repository.SchemaMigrationMySqlIT" name="explicitlyBaselinesExistingSchemaWithoutLosingData" />
+  <testcase classname="com.samkim.countryintegration.repository.SchemaMigrationMySqlIT" name="rejectsChangedMigrationChecksum" />
+  <testcase classname="com.samkim.countryintegration.repository.SchemaMigrationMySqlIT" name="migratesFreshDatabaseAndValidatesSchema" />
+</testsuite>

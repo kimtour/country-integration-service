@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.066" tests="7" errors="0" skipped="0" failures="0" flakes="0">
-  <testcase name="parsesProviderUnknownMessageBeforeTryingMultiWordFallback" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.018" />
-  <testcase name="preservesServiceUnavailableStatus" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.004" />
-  <testcase name="mapsInvalidIsoResponseToBadGateway" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.005" />
-  <testcase name="preservesUnrelatedDatabaseFailures" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.005" />
-  <testcase name="preservesGatewayTimeoutStatus" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.006" />
-  <testcase name="mapsInvalidFullCountryResponseToBadGateway" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.009" />
-  <testcase name="mapsDuplicateSaveRaceToConflict" classname="com.samkim.countryintegration.service.CountryServiceFailureTest" time="0.012" />
+<testsuite name="com.samkim.countryintegration.service.CountryServiceFailureTest" tests="7" failures="0" errors="0" skipped="0" time="0.079">
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="parsesProviderUnknownMessageBeforeTryingMultiWordFallback" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="preservesServiceUnavailableStatus" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="mapsInvalidIsoResponseToBadGateway" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="preservesUnrelatedDatabaseFailures" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="preservesGatewayTimeoutStatus" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="mapsInvalidFullCountryResponseToBadGateway" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceFailureTest" name="mapsDuplicateSaveRaceToConflict" />
 </testsuite>

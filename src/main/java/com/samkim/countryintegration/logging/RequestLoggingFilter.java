@@ -18,6 +18,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
+    @org.springframework.beans.factory.annotation.Value("${POD_NAME:local}")
+    private String instanceId = "local";
+
     private static final Logger log =
             LoggerFactory.getLogger(RequestLoggingFilter.class);
 
@@ -33,6 +36,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
         MDC.put("requestId", requestId);
         response.setHeader("X-Request-ID", requestId);
+        response.setHeader("X-Instance-ID", instanceId);
 
         try {
             filterChain.doFilter(request, response);

@@ -1,13 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.service.CountryServiceTest" time="0.391" tests="10" errors="0" skipped="0" failures="0" flakes="0">
-  <testcase name="createsCountryUsingNormalizedName" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.353" />
-  <testcase name="unknownMultiWordCountryStillReturns404" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.005" />
-  <testcase name="updatesDetailsAndReplacesLanguagesWithoutCallingSoap" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.004" />
-  <testcase name="unknownSingleWordCountryDoesNotRepeatLookup" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.002" />
-  <testcase name="returnsNotFoundForMissingId" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.002" />
-  <testcase name="retriesUnknownMultiWordNameWithProviderTitleCase" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.008" />
-  <testcase name="rejectsBlankNameBeforeCallingSoap" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.002" />
-  <testcase name="normalizesMultiWordNamesToSentenceCase" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.002" />
-  <testcase name="deletesExistingCountryWithoutCallingSoap" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.001" />
-  <testcase name="rejectsDuplicateCountryBeforeFetchingFullDetails" classname="com.samkim.countryintegration.service.CountryServiceTest" time="0.003" />
+<testsuite name="com.samkim.countryintegration.service.CountryServiceTest" tests="14" failures="0" errors="0" skipped="0" time="0.761">
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="usesCanonicalProviderSpellingWhenTitleCaseStillFails" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="createsCountryUsingNormalizedName" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="unknownMultiWordCountryStillReturns404" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="upstreamFailureDoesNotTriggerNameFallback" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="updatesDetailsAndReplacesLanguagesWithoutCallingSoap" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="resolvesHyphenatedCountryNames" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="rejectsInvalidPagination" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="unknownSingleWordCountryDoesNotRepeatLookup" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="returnsNotFoundForMissingId" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="retriesUnknownMultiWordNameWithProviderTitleCase" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="rejectsBlankNameBeforeCallingSoap" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="normalizesMultiWordNamesToSentenceCase" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="deletesExistingCountryWithoutCallingSoap" />
+  <testcase classname="com.samkim.countryintegration.service.CountryServiceTest" name="rejectsDuplicateCountryBeforeFetchingFullDetails" />
 </testsuite>

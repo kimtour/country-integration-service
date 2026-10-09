@@ -170,4 +170,21 @@ class CountrySoapClientTest {
                 </soap:Envelope>
                 """.formatted(body);
     }
+    @Test
+    void canonicalNamesPreserveProviderSpellingAndCacheCatalogue() {
+        SoapTransport transport = mock(SoapTransport.class);
+        when(transport.send(anyString())).thenReturn("""
+                <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:x="http://www.oorsprong.org/websamples.countryinfo"><soap:Body>
+                  <x:ListOfCountryNamesByNameResult><x:tCountryCodeAndName>
+                  <x:sISOCode>MD</x:sISOCode><x:sName>Moldova, Republic of</x:sName>
+                  </x:tCountryCodeAndName></x:ListOfCountryNamesByNameResult>
+                  </soap:Body></soap:Envelope>
+                """);
+        CountrySoapClient client = new CountrySoapClient(transport);
+        assertEquals(java.util.Optional.of("Moldova, Republic of"),
+                client.findCanonicalCountryName("MOLDOVA,  REPUBLIC OF"));
+        assertEquals(java.util.Optional.empty(), client.findCanonicalCountryName("unknown"));
+        verify(transport, times(1)).send(anyString());
+    }
 }

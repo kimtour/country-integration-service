@@ -3,6 +3,10 @@ package com.samkim.countryintegration.integration;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Optional;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,9 +30,44 @@ public class CountrySoapClient {
             "http://schemas.xmlsoap.org/soap/envelope/";
 
     private final SoapTransport transport;
+    private volatile Map<String, String> countryNames = Map.of();
+    private volatile long namesExpireAt;
 
     public CountrySoapClient(SoapTransport transport) {
         this.transport = transport;
+    }
+
+    public SoapTransport.ImportBudget beginImport() {
+        return transport.beginImport();
+    }
+
+    public synchronized Optional<String> findCanonicalCountryName(String name) {
+        if (System.nanoTime() >= namesExpireAt) {
+            String envelope = """
+                    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        xmlns:web="http://www.oorsprong.org/websamples.countryinfo">
+                      <soap:Body><web:ListOfCountryNamesByName/></soap:Body>
+                    </soap:Envelope>
+                    """;
+            Document document = parseXml(transport.send(envelope));
+            NodeList entries = document.getElementsByTagNameNS(COUNTRY_NAMESPACE, "tCountryCodeAndName");
+            if (entries.getLength() == 0) {
+                throw new IllegalStateException("Country name catalogue is missing");
+            }
+            Map<String, String> names = new HashMap<>();
+            for (int i = 0; i < entries.getLength(); i++) {
+                String canonical = childText((Element) entries.item(i), "sName");
+                if (canonical.isBlank()) throw new IllegalStateException("Empty country catalogue name");
+                names.put(nameKey(canonical), canonical);
+            }
+            countryNames = Map.copyOf(names);
+            namesExpireAt = System.nanoTime() + java.time.Duration.ofHours(6).toNanos();
+        }
+        return Optional.ofNullable(countryNames.get(nameKey(name)));
+    }
+
+    private String nameKey(String name) {
+        return name.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 
     public String fetchIsoCode(String countryName) {

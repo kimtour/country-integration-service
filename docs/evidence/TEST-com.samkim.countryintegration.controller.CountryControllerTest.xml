@@ -1,19 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.controller.CountryControllerTest" time="1.022" tests="8" errors="0" skipped="0" failures="0" flakes="0">
-  <testcase name="returnsMethodNotAllowedForPostToCountryId" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.608">
-    </testcase>
-  <testcase name="returnsNotFoundWithClearDetail" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.045">
-    </testcase>
-  <testcase name="deletesCountryAndReturnsEmptyBody" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.027">
-    </testcase>
-  <testcase name="rejectsBlankCountryName" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.198">
-    </testcase>
-  <testcase name="returnsCountryById" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.039">
-    </testcase>
-  <testcase name="rejectsUnsupportedMediaTypeWith415" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.035">
-    </testcase>
-  <testcase name="rejectsMalformedJson" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.031">
-    </testcase>
-  <testcase name="rejectsUnacceptableResponseFormatWith406" classname="com.samkim.countryintegration.controller.CountryControllerTest" time="0.029">
-    </testcase>
+<testsuite name="com.samkim.countryintegration.controller.CountryControllerTest" tests="12" failures="0" errors="0" skipped="0" time="3.911">
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="updatesCountryAndReturns200" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="returnsMethodNotAllowedForPostToCountryId" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="returnsNotFoundWithClearDetail" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="passesPageAndSizeToService" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="deletesCountryAndReturnsEmptyBody" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="rejectsBlankCountryName" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="createsCountryWith201AndLocation" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="returnsCountryById" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="rejectsUnsupportedMediaTypeWith415" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="rejectsInvalidUpdateWithoutCallingService" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="rejectsMalformedJson" />
+  <testcase classname="com.samkim.countryintegration.controller.CountryControllerTest" name="rejectsUnacceptableResponseFormatWith406" />
 </testsuite>

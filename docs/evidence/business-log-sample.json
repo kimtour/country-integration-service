@@ -1,0 +1,97 @@
+[
+  {
+    "@timestamp": "2026-10-09T10:03:36.665197594Z",
+    "message": "Country import requested",
+    "requestId": "f38f9ee7-4ad1-4807-8307-bfb7fcfd6d7c",
+    "operation": "country_create"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:43.409056541Z",
+    "message": "Country ISO resolved",
+    "requestId": "f38f9ee7-4ad1-4807-8307-bfb7fcfd6d7c",
+    "isoCode": "GW"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:50.066970669Z",
+    "message": "Country saved",
+    "requestId": "f38f9ee7-4ad1-4807-8307-bfb7fcfd6d7c",
+    "countryId": 4,
+    "isoCode": "GW"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:53.274287713Z",
+    "message": "Country import requested",
+    "requestId": "373a5990-bcd9-4e50-8dad-018521d4be86",
+    "operation": "country_create"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:54.396193380Z",
+    "message": "Country ISO resolved",
+    "requestId": "373a5990-bcd9-4e50-8dad-018521d4be86",
+    "isoCode": "PG"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:55.208429922Z",
+    "message": "Country saved",
+    "requestId": "373a5990-bcd9-4e50-8dad-018521d4be86",
+    "countryId": 5,
+    "isoCode": "PG"
+  },
+  {
+    "@timestamp": "2026-10-09T10:03:58.369660257Z",
+    "message": "Country import requested",
+    "requestId": "b80ca400-296b-4464-8fc0-c22aeb88e64a",
+    "operation": "country_create"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:00.604778508Z",
+    "message": "Country ISO resolved",
+    "requestId": "b80ca400-296b-4464-8fc0-c22aeb88e64a",
+    "isoCode": "MD"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:03.398565967Z",
+    "message": "Country saved",
+    "requestId": "b80ca400-296b-4464-8fc0-c22aeb88e64a",
+    "countryId": 6,
+    "isoCode": "MD"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:10.092330054Z",
+    "message": "Country import requested",
+    "requestId": "899d671f-72c1-4be9-b79a-9c3c610998c2",
+    "operation": "country_create"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:12.021724971Z",
+    "message": "Country ISO resolved",
+    "requestId": "899d671f-72c1-4be9-b79a-9c3c610998c2",
+    "isoCode": "GW"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:12.619097055Z",
+    "message": "Duplicate country detected",
+    "requestId": "899d671f-72c1-4be9-b79a-9c3c610998c2",
+    "isoCode": "GW"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:12.967769472Z",
+    "message": "Country import did not complete",
+    "requestId": "899d671f-72c1-4be9-b79a-9c3c610998c2",
+    "operation": "country_create",
+    "status": "409"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:27.759938422Z",
+    "message": "Country import requested",
+    "requestId": "dbbcba54-4413-4428-a57f-374c4801660b",
+    "operation": "country_create"
+  },
+  {
+    "@timestamp": "2026-10-09T10:04:29.440523548Z",
+    "message": "Country import did not complete",
+    "requestId": "dbbcba54-4413-4428-a57f-374c4801660b",
+    "operation": "country_create",
+    "status": "404"
+  }
+]

@@ -70,4 +70,20 @@ abstract class CountryPersistenceChecks {
         assertThrows(DataIntegrityViolationException.class,
                 () -> repository.saveAndFlush(new CountryInfo("KE", "Duplicate")));
     }
+    @Test
+    void pagesCountriesBeforeFetchingLanguages() {
+        kenya();
+        CountryInfo second = new CountryInfo("GW", "Guinea-Bissau");
+        second.replaceLanguages(List.of(new Language("por", "Portuguese")));
+        repository.saveAndFlush(second);
+        entityManager.clear();
+        var service = new com.samkim.countryintegration.service.CountryService(
+                org.mockito.Mockito.mock(com.samkim.countryintegration.integration.CountrySoapClient.class), repository);
+        List<CountryInfo> page = service.getCountries(1, 1);
+        assertEquals(1, page.size());
+        assertEquals("GW", page.getFirst().getIsoCode());
+        entityManager.detach(page.getFirst());
+        assertEquals("Portuguese", page.getFirst().getLanguages().getFirst().getName());
+        assertTrue(service.getCountries(2, 1).isEmpty());
+    }
 }

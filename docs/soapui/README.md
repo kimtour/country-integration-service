@@ -28,7 +28,9 @@ The script writes fresh runner reports to ignored `target/soapui-reports/`. The 
 
 ## Multi-word names
 
-A live sentence-case request for `South africa` returned “No country found by that name.” The provider accepts `South Africa` and returns ZA. The service first tries the requested sentence-case name, then makes one title-case lookup if an unknown-country response concerns a multi-word name. Network errors and timeouts keep their original failure status. Tests cover this behavior and unknown-country results; country details are still taken from FullCountryInfo.
+A live sentence-case request for `South africa` returned “No country found by that name.” The provider accepts `South Africa` and returns ZA. The service first tries the required sentence-case name, then punctuation-aware title case, and finally exact spelling from a provider catalogue cached for six hours. Hyphenated Guinea-Bissau and Papua-New Guinea and provider-specific Moldova, Republic of are covered by regression tests and live application checks. Network failures do not trigger name-format fallback; country details still come from FullCountryInfo.
+
+The final presentation uses the genuine imported operation tree plus actual saved request/response XML and assertion results. A new full-window request/response/assertion screenshot could not be captured because native SoapUI window access failed. The saved project and runner evidence remain available; the slide does not claim to be a full-window capture.
 
 ## Endpoint security
 

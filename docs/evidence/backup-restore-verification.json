@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-09",
+  "database": "Disposable MySQL 8.4; container removed after check",
+  "gzip_valid": true,
+  "restored_iso_codes": [
+    "GW",
+    "KE",
+    "MD",
+    "PG",
+    "TZ",
+    "ZA"
+  ],
+  "countries": 6,
+  "languages": 6,
+  "successful_schema_history_entries": 1,
+  "limits": "Local dump/import verification; does not establish production RTO/RPO, storage recovery or HA."
+}

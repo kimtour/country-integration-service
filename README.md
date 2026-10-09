@@ -14,7 +14,7 @@ flowchart TD
     Repository --> Database["Shared MySQL database"]
 ```
 
-Creation normalizes the country name to sentence case (with a title-case provider lookup for unknown multi-word names), resolves its ISO code with CountryISOCode, retrieves FullCountryInfo, checks for duplicates, and saves the country and languages. Stored-country reads, updates, and deletes use MySQL. External SOAP calls happen before the database save.
+Creation normalizes the country name to sentence case (with punctuation-aware title case and a cached canonical provider-name catalogue for unknown names), resolves its ISO code with CountryISOCode, retrieves FullCountryInfo, checks for duplicates, and saves the country and languages. Stored-country reads, updates, and deletes use MySQL. External SOAP calls happen before the database save.
 
 The application replicas share one database. Request state stays within each request. Retry and circuit breaker state is local to each application process.
 
@@ -58,12 +58,14 @@ curl -i http://localhost:8081/api/countries
 
 Allow Spring Boot to finish starting before sending requests. The application is exposed on localhost:8081. The development database is exposed on localhost:3307. Database files persist in the Compose mysql_data volume.
 
+For an existing Compose database created before Flyway, take a backup first and run `DB_BASELINE_ON_MIGRATE=true docker compose up -d --build` once. Confirm the schema validates, then redeploy with the default false. Fresh databases need no baseline flag. Baseline adopts version 1; it does not repair an incompatible schema.
+
 ## REST API
 
 | Method | Path | Expected success |
 | --- | --- | --- |
 | POST | /api/countries | 201 Created, response body and Location header |
-| GET | /api/countries | 200 OK, country list |
+| GET | /api/countries?page=0&size=100 | 200 OK, country page as a JSON array |
 | GET | /api/countries/{id} | 200 OK, country details |
 | PUT | /api/countries/{id} | 200 OK, updated country |
 | DELETE | /api/countries/{id} | 204 No Content |
@@ -113,11 +115,11 @@ Errors use ProblemDetail responses with status, title, detail, instance, timesta
 | 503 | Transport connection failure or open circuit |
 | 504 | Upstream timeout |
 
-The transport uses a five-second connection timeout and an eight-second request timeout. Eligible failures receive at most two attempts with a 300-millisecond retry delay.
+The transport uses a five-second connection timeout and an eight-second request timeout. Eligible failures receive at most two attempts with a 300-millisecond retry delay. Each HTTP request is capped by the remaining 20-second SOAP sequence budget; this does not cap database work or servlet scheduling.
 
 The circuit breaker evaluates logical calls after retry. It has a ten-call window, minimum five calls, 50% failure threshold, 30-second open duration, and two permitted half-open calls. It ignores non-retryable transport failures. SOAP faults and parsing errors occur outside the transport breaker.
 
-During a SOAP outage, creation returns an explicit error and stored-country reads remain available through MySQL. This is the implemented degraded-operation behavior. Cached SOAP results and fabricated fallback data are not implemented.
+During a SOAP outage, creation returns an explicit error and stored-country reads remain available through MySQL. This is the implemented degraded-operation behavior. The canonical-name catalogue is cached for six hours; country details and fabricated fallback data are not cached.
 
 XML parsing disables DOCTYPE declarations and external DTD/schema access. XML-special characters are escaped in requests.
 
@@ -134,7 +136,7 @@ curl -i http://localhost:8081/actuator/metrics/http.server.requests
 curl -i http://localhost:8081/actuator/prometheus
 ```
 
-HTTP metrics and health were verified. Prometheus scraping, dashboards, and distributed tracing have not been demonstrated. Restrict management endpoint access in a production deployment.
+HTTP metrics and health were verified. Prometheus scraping of both pods, evaluated alert rules and the provisioned Grafana dashboard were verified. Distributed tracing and external notification delivery remain future deployment work. Restrict management endpoint access in a production deployment.
 
 ## Tests
 
@@ -147,7 +149,7 @@ HTTP metrics and health were verified. Prometheus scraping, dashboards, and dist
 ./mvnw -Pmysql-it clean verify
 ```
 
-The verified suite passes 42 default tests plus 5 MySQL integration tests, with no failures, errors, or skips. Coverage includes normalization (including multi-word names), duplicate races, update/delete behavior, SOAP parsing and faults, XML hardening, framework HTTP status preservation, retries, circuit opening, and JPA cascade/orphan behavior. The MySQL tests use their own temporary database and never use the Compose or Kubernetes country data. H2 checks complement the real MySQL checks; they do not prove MySQL compatibility by themselves.
+The verified suite passes 55 default tests plus 9 MySQL integration tests, with no failures, errors, or skips. Coverage includes normalization (including multi-word names), duplicate races, update/delete behavior, SOAP parsing and faults, XML hardening, framework HTTP status preservation, retries, circuit opening, and JPA cascade/orphan behavior. The MySQL tests use their own temporary database and never use the Compose or Kubernetes country data. H2 checks complement the real MySQL checks; they do not prove MySQL compatibility by themselves.
 
 See [test evidence](docs/TEST_RESULTS.md). The [CI workflow](.github/workflows/ci.yaml) runs both suites and builds the image, then uploads test reports. A local pass does not imply a hosted CI run has passed. Load capacity and production availability require separate tests.
 
@@ -163,6 +165,8 @@ The assessment WSDL was imported with the installed SoapUI 5.10.0. The [saved pr
 
 These live provider checks need outbound HTTP access. The supplied brief specifies HTTP; HTTPS did not establish a connection from this environment, so the working assessment endpoint remains configurable through COUNTRY_SOAP_URL.
 
+GET uses zero-based pages, defaults to 100 records and accepts sizes 1–100. Invalid bounds return 400. Fetch successive pages until an empty array to retrieve the complete collection. Country rows are paged in SQL before fetching their languages; the response remains a JSON array.
+
 ## Kubernetes
 
 See [deployment and troubleshooting instructions](docs/DEPLOYMENT.md) for complete setup and commands.
@@ -173,7 +177,9 @@ See [deployment and troubleshooting instructions](docs/DEPLOYMENT.md) for comple
 ./scripts/verify.sh
 ```
 
-The script builds the image, creates the namespace and Secret from `.env`, waits for MySQL, initializes the application with one replica, and then scales to two. KUBE_CONTEXT, APP_REPLICAS, and APP_IMAGE can override local defaults. Remote clusters require pushing the selected image to a registry they can access. Use a distinct tag for every changed build to avoid stale cached images.
+The script builds from source, creates the namespace and Secret from `.env`, waits for MySQL, runs Flyway with one application replica, then scales to two. Fresh schemas migrate automatically; Hibernate validates them. To adopt an existing pre-Flyway schema, first run `./scripts/backup-db.sh`, then explicitly run `BASELINE_EXISTING_SCHEMA=true ./scripts/deploy.sh` once and return to the default false after verification.
+
+`KUBE_CONTEXT`, `APP_REPLICAS` and `APP_IMAGE` override defaults. Image tags are derived from Docker build inputs. `IMAGE_LOAD_MODE=auto` uses Docker Desktop images directly, imports into kind/minikube, or requires `APP_IMAGE=<registry>/<name>:<tag> PUSH_IMAGE=true` for a remote cluster. Remote credentials, storage classes and capacity remain environment prerequisites.
 
 An optional HPA (2–4 replicas, 70% CPU) and disruption budget are in [k8s/optional/autoscaling.yaml](k8s/optional/autoscaling.yaml). They require the metrics API and enough node capacity; automatic scaling has not been load-tested.
 
@@ -194,24 +200,35 @@ The Kubernetes database has separate storage from Compose. The local deployment 
 
 A later recheck exposed CPU throttling and probe timeouts. The local manifest now requests 500m CPU, allows two CPUs, gives startup ten minutes, and uses ten-second probe timeouts with six liveness failures before restart. Rolling updates replace one replica at a time without surge. After this change, both replicas started in about 64 and 49 seconds and passed a five-minute observation with 88 successful health/data requests, two ready Service backends, and zero restarts. Both returned Kenya and Tanzania. This verifies the local fix over that window; long-term availability and load capacity require separate tests. See the deployment guide for details.
 
-The final source build was rechecked on 9 October 2026: both replicas passed health and HTTP status checks with zero restarts. South Africa created through one replica was readable through the other; duplicate and unknown-country responses were 409 and 404. See [final Kubernetes evidence](docs/evidence/kubernetes-verification.json) and [47-test results](docs/TEST_RESULTS.md). The project’s separate Compose containers are currently stopped to reduce local resource contention; their volume and data are preserved.
+The final verification evidence is in [Kubernetes results](docs/evidence/kubernetes-verification.json) and [64-test results](docs/TEST_RESULTS.md). Earlier probe tuning and the 88-request observation above are historical checks. The latest checks additionally cover hyphenated/canonical country lookup, migration adoption, bounded pages and service metrics. Compose containers are stopped during Kubernetes verification to avoid competing workloads; their database volume is preserved.
 
-Both replicas run on one Docker Desktop node. MySQL has one instance. Multi-node resilience, automatic scaling, database failover, and production backups have not been verified.
+## Monitoring and measurements
+
+```bash
+kubectl --context=docker-desktop apply -f k8s/optional/monitoring.yaml
+kubectl --context=docker-desktop -n country-integration port-forward service/country-prometheus 9090:9090
+# Separate terminal:
+kubectl --context=docker-desktop -n country-integration port-forward service/country-grafana 3000:3000
+```
+
+Prometheus discovers both application pods, scrapes Actuator, and evaluates unavailable/5xx alert rules. Grafana provisions [the service dashboard](docs/monitoring/country-service-dashboard.json). This optional local configuration uses ephemeral storage and internal Services; Grafana permits anonymous viewing. Notification delivery, persistent monitoring storage and production access controls require deployment configuration.
+
+Run `python3 scripts/load-test.py --output target/load-results.json` for a bounded, read-only sample. It records statuses, latency percentiles, request rate and pod identity. A Service port-forward uses one pod for its session; use `./scripts/load-test-k8s.sh` to measure the internal Service route across both replicas. See [measured local results](docs/evidence/load-results.json). Local measurements do not establish maximum throughput or production capacity.
 
 ## Current limits and next improvements
 
-The current schema is managed through Hibernate ddl-auto=update. For fresh deployment, initialize the schema with one application replica before increasing to two. Versioned database migrations and Hibernate validation are planned improvements.
+Versioned Flyway migrations, Hibernate validation, and an explicit existing-schema baseline are implemented and tested against MySQL. The backup script creates a private compressed dump. The [isolated restore script](scripts/test-backup-restore.py) recovered all six countries, six languages and migration history in disposable MySQL; see [restore evidence](docs/evidence/backup-restore-verification.json). This local check does not establish production disaster recovery. The SOAP sequence has a 20-second budget across lookups/retries; database work and servlet scheduling are outside that budget.
 
-The SOAP endpoint currently uses HTTP. API authentication, TLS termination, production secret management, database high availability, backup/restore testing, and load testing need further implementation or deployment configuration. Framework errors now retain standard statuses and headers, including 406 and 415.
+Both replicas run on one Docker Desktop node and MySQL has one instance. The metrics API is absent here, so HPA behavior remains unverified. Production still requires multi-node/database HA, recovery exercises, API authentication/TLS, managed secrets, monitoring notification destinations and sustained load/failure tests. The assessment provider remains HTTP as supplied in the brief; its endpoint is configurable. These boundaries are stated in the presentation.
 
 ## Case study submission
 
 Prepared by Samuel Mutua Kimani.
 
-- [Presentation, 13 slides](docs/submission/Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pptx)
-- [Matching PDF, 13 pages](docs/submission/Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
+- [Presentation, 18 slides](docs/submission/Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pptx)
+- [Matching PDF, 18 pages](docs/submission/Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
 - [GitHub repository](https://github.com/kimtour/country-integration-service)
 
-The presentation records the initial successful checks, the later probe failures, and recovery after CPU/probe tuning. See [submission instructions and email draft](docs/submission/README.md).
+The presentation follows questions 1–10, explains entity/DTO responsibilities, provides exact setup/test commands, and distinguishes verified local results from proposed production architecture. See [submission instructions and email draft](docs/submission/README.md).
 
 See [assessment requirement coverage and trade-offs](docs/REQUIREMENTS.md).

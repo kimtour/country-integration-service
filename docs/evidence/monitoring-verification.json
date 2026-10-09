@@ -1,0 +1,31 @@
+{
+  "checked_eat": "2026-10-09T13:07:34.890131",
+  "targets": [
+    {
+      "instance": "country-app-74fb9968d6-9hz54",
+      "health": "up",
+      "last_error": ""
+    },
+    {
+      "instance": "country-app-74fb9968d6-dg9jn",
+      "health": "up",
+      "last_error": ""
+    }
+  ],
+  "rule_groups": [
+    {
+      "name": "country-service",
+      "rules": [
+        "CountryApplicationUnavailable",
+        "CountryApplicationErrors"
+      ]
+    }
+  ],
+  "grafana_dashboards": [
+    {
+      "title": "Country service verification",
+      "uid": "country-service"
+    }
+  ],
+  "limits": "Ephemeral local metrics storage; evaluated rules only, no notification destinations."
+}

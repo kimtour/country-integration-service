@@ -84,6 +84,57 @@ class SoapTransportTest {
         assertEquals(10, requestCount.get());
     }
 
+    @Test
+    void expiredImportBudgetDoesNotSendRequestAndIsCleared() throws Exception {
+        String url = startServer(200);
+        SoapTransport transport = new SoapTransport(url, java.time.Duration.ofSeconds(1),
+                java.time.Duration.ofSeconds(1), java.time.Duration.ofMillis(20));
+        try (var budget = transport.beginImport()) {
+            Thread.sleep(40);
+            ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                    () -> transport.send("<request/>"));
+            assertEquals(504, error.getStatusCode().value());
+            assertEquals(0, requestCount.get());
+        }
+        assertEquals("<response/>", transport.send("<request/>"));
+    }
+
+    @Test
+    void halfOpenCircuitClosesAfterSuccessfulRecoveryCalls() throws Exception {
+        String url = startServer(503,503,503,503,503,503,503,503,503,503,200,200);
+        SoapTransport transport = new SoapTransport(url);
+        for (int i = 0; i < 5; i++) assertThrows(ResponseStatusException.class,
+                () -> transport.send("<request/>"));
+        transport.circuitBreaker().transitionToHalfOpenState();
+        assertEquals("<response/>", transport.send("<request/>"));
+        assertEquals("<response/>", transport.send("<request/>"));
+        assertEquals(io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED,
+                transport.circuitBreaker().getState());
+    }
+
+    @Test
+    void actualHttpTimeoutReturns504() throws Exception {
+        server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.setExecutor(java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
+        server.createContext("/soap", exchange -> {
+            try {
+                requestCount.incrementAndGet();
+                Thread.sleep(400);
+                exchange.sendResponseHeaders(200, -1);
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+            } finally { exchange.close(); }
+        });
+        server.start();
+        SoapTransport transport = new SoapTransport("http://127.0.0.1:" + server.getAddress().getPort() + "/soap",
+                java.time.Duration.ofMillis(100), java.time.Duration.ofSeconds(1),
+                java.time.Duration.ofSeconds(1));
+        ResponseStatusException failure = assertThrows(ResponseStatusException.class,
+                () -> transport.send("<request/>"));
+        assertEquals(504, failure.getStatusCode().value());
+        org.junit.jupiter.api.Assertions.assertTrue(requestCount.get() >= 1 && requestCount.get() <= 2);
+    }
+
     private String startServer(int... responseStatuses)
             throws IOException {
 

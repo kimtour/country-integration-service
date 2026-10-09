@@ -1,13 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-failsafe-plugin/xsd/failsafe-test-report.xsd" version="3.0.2" name="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="70.371" tests="5" errors="0" skipped="0" failures="0" flakes="0">
-  <testcase name="deleteCascadesToLanguages" classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="2.647">
-    </testcase>
-  <testcase name="replacementRemovesOrphanLanguages" classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="0.118">
-    </testcase>
-  <testcase name="persistsCountryAndLoadsLanguagesForBothReadPaths" classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="0.077">
-    </testcase>
-  <testcase name="databaseRejectsDuplicateIsoCodes" classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="0.091">
-    </testcase>
-  <testcase name="concurrentCreatesReturnOneSuccessAndOneConflict" classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" time="1.488">
-    </testcase>
+<testsuite name="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" tests="6" failures="0" errors="0" skipped="0" time="194.181">
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="deleteCascadesToLanguages" />
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="replacementRemovesOrphanLanguages" />
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="pagesCountriesBeforeFetchingLanguages" />
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="persistsCountryAndLoadsLanguagesForBothReadPaths" />
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="databaseRejectsDuplicateIsoCodes" />
+  <testcase classname="com.samkim.countryintegration.repository.CountryRepositoryMySqlIT" name="concurrentCreatesReturnOneSuccessAndOneConflict" />
 </testsuite>
