@@ -1,6 +1,30 @@
 # Country Integration Service
 
-Spring Boot REST service that retrieves country details from an external SOAP API and persists countries and their languages in MySQL. Built for the NCBA LOOP Integrations and Microservices Engineer case study.
+## Project overview
+
+A Spring Boot service that gives REST clients access to country information obtained from an external SOAP provider. It imports country details and languages into MySQL, then supports reading, updating and deleting the stored records.
+
+### Purpose and users
+
+The integration problem is making an older SOAP interface usable through a consistent JSON API while retaining a local copy of imported data. Intended users are application developers integrating country reference data and operators maintaining the service. A deployed business customer is not established by this repository.
+
+### Inputs and outputs
+
+A client submits a country name to import or sends changes to an existing record. The SOAP provider supplies the ISO code, capital, phone code, continent, currency, flag URL and languages. Outputs are JSON country records, paged lists and structured errors; MySQL stores countries and associated languages. Logs and Actuator metrics support operation.
+
+### Logic and workflow
+
+Submit a country name → normalize and resolve its ISO code → retrieve full SOAP details → check for duplicates → persist the country and languages → return the saved record. Stored reads and edits use MySQL rather than refreshing the provider automatically. Updates replace the language collection while retaining the country's identity. Bounded retries, timeouts and a process-local circuit breaker handle eligible transport failures. A provider outage prevents new imports but does not inherently prevent reads of stored data.
+
+### Integrations
+
+The service connects to the CountryInfo SOAP API and MySQL through a Java HTTP/XML client and Spring Data JPA. Flyway manages schema migrations. Docker Compose and Kubernetes manifests describe deployment; optional Prometheus/Grafana configuration provides monitoring. GitHub Actions defines build, test and container checks.
+
+### Running, maintenance and boundaries
+
+Imports are requested by clients; this is not a scheduled country-sync process. Run locally with Java/Maven, Compose or the supplied Kubernetes scripts. Maintain provider compatibility, database migrations/backups, credentials and monitoring. No managed production hosting or fixed operating cost is established; compute, storage and network costs depend on deployment.
+
+CRUD, resilience and local deployment checks are documented. This is a focused reference-data integration, not a general integration platform. The current provider connection uses configurable HTTP; API authentication/TLS, high availability, sustained load validation and production recovery remain deployment work. Existing verification results describe specific local checks, not a production service guarantee.
 
 ## Architecture
 
@@ -155,7 +179,7 @@ See [test evidence](docs/TEST_RESULTS.md). The [CI workflow](.github/workflows/c
 
 ## SoapUI
 
-The assessment WSDL was imported with the installed SoapUI 5.10.0. The [saved project](docs/soapui/country-info-soapui-project.xml) contains both SOAP bindings and all 21 operations per binding, plus executable request assertions. See [import screenshot, examples, and verification instructions](docs/soapui/README.md).
+The country-service WSDL was imported with the installed SoapUI 5.10.0. The [saved project](docs/soapui/country-info-soapui-project.xml) contains both SOAP bindings and all 21 operations per binding, plus executable request assertions. See [import screenshot, examples, and verification instructions](docs/soapui/README.md).
 
 ```bash
 # On macOS this defaults to the installed SoapUI 5.10.0 path.
@@ -163,7 +187,7 @@ The assessment WSDL was imported with the installed SoapUI 5.10.0. The [saved pr
 ./scripts/test-soapui.sh
 ```
 
-These live provider checks need outbound HTTP access. The supplied brief specifies HTTP; HTTPS did not establish a connection from this environment, so the working assessment endpoint remains configurable through COUNTRY_SOAP_URL.
+These live provider checks need outbound HTTP access. HTTPS did not establish a connection from the documented environment; the current HTTP SOAP endpoint remains configurable through COUNTRY_SOAP_URL.
 
 GET uses zero-based pages, defaults to 100 records and accepts sizes 1–100. Invalid bounds return 400. Fetch successive pages until an empty array to retrieve the complete collection. Country rows are paged in SQL before fetching their languages; the response remains a JSON array.
 
@@ -219,9 +243,9 @@ Run `python3 scripts/load-test.py --output target/load-results.json` for a bound
 
 Versioned Flyway migrations, Hibernate validation, and an explicit existing-schema baseline are implemented and tested against MySQL. The backup script creates a private compressed dump. The [isolated restore script](scripts/test-backup-restore.py) recovered all six countries, six languages and migration history in disposable MySQL; see [restore evidence](docs/evidence/backup-restore-verification.json). This local check does not establish production disaster recovery. The SOAP sequence has a 20-second budget across lookups/retries; database work and servlet scheduling are outside that budget.
 
-Both replicas run on one Docker Desktop node and MySQL has one instance. The metrics API is absent here, so HPA behavior remains unverified. Production still requires multi-node/database HA, recovery exercises, API authentication/TLS, managed secrets, monitoring notification destinations and sustained load/failure tests. The assessment provider remains HTTP as supplied in the brief; its endpoint is configurable. These boundaries are stated in the presentation.
+Both replicas run on one Docker Desktop node and MySQL has one instance. The metrics API is absent here, so HPA behavior remains unverified. Production still requires multi-node/database HA, recovery exercises, API authentication/TLS, managed secrets, monitoring notification destinations and sustained load/failure tests. The configured SOAP provider uses HTTP; its endpoint is configurable. These boundaries are stated in the presentation.
 
-## Case study submission
+## Supporting technical documentation
 
 Prepared by Samuel Mutua Kimani.
 
@@ -229,6 +253,6 @@ Prepared by Samuel Mutua Kimani.
 - [Matching PDF, 18 pages](docs/submission/Case%20Study%20Submission%20%E2%80%93%20Integrations%20and%20Microservices%20Engineer%20%E2%80%93%20Samuel%20Mutua%20Kimani.pdf)
 - [GitHub repository](https://github.com/kimtour/country-integration-service)
 
-The presentation follows questions 1–10, explains entity/DTO responsibilities, provides exact setup/test commands, and distinguishes verified local results from proposed production architecture. See [submission instructions and email draft](docs/submission/README.md).
+The presentation explains entity/DTO responsibilities, setup/test commands and the distinction between verified local results and proposed production architecture.
 
-See [assessment requirement coverage and trade-offs](docs/REQUIREMENTS.md).
+See [requirement coverage and trade-offs](docs/REQUIREMENTS.md).
